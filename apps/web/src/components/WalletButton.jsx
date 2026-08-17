@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  connectWallet,
-  getChainId,
-  isArcTestnet,
-  signMessage
-} from "../services/blockchain.js";
-import {
-  apiRequest,
-  saveSession
-} from "../services/api.js";
+import { authenticateWallet } from "../services/auth.js";
 
 export default function WalletButton() {
   const [account, setAccount] = useState("");
@@ -20,38 +11,8 @@ export default function WalletButton() {
     setLoading(true);
 
     try {
-      const address = await connectWallet();
-      const chainId = await getChainId();
-
-      if (!isArcTestnet(chainId)) {
-        setAccount("");
-        throw new Error("Please switch your wallet to Arc Testnet.");
-      }
-
-      const challenge = await apiRequest("/api/auth/challenge", {
-        method: "POST",
-        body: JSON.stringify({
-          walletAddress: address
-        })
-      });
-
-      const signature = await signMessage(challenge.nonce);
-
-      const verification = await apiRequest("/api/auth/verify", {
-        method: "POST",
-        body: JSON.stringify({
-          walletAddress: address,
-          signature
-        })
-      });
-
-      saveSession(verification.sessionToken);
-
-      await apiRequest("/api/auth/merchant", {
-        method: "POST"
-      });
-
-      setAccount(address);
+      const result = await authenticateWallet();
+      setAccount(result.walletAddress);
     } catch (err) {
       setError(err.message || "Unable to authenticate wallet");
     } finally {
