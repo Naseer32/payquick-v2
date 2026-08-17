@@ -3,8 +3,27 @@ import { apiRequest } from "../services/api.js";
 
 export default function Invoices({ merchant }) {
   const [invoices, setInvoices] = useState([]);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState("USDC");
+  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+
+  async function loadInvoices() {
+    setLoading(true);
+    setError("");
+
+    try {
+      const result = await apiRequest("/api/invoices");
+      setInvoices(result.invoices || []);
+    } catch (err) {
+      setError(err.message || "Unable to load invoices.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (!merchant) {
@@ -12,22 +31,37 @@ export default function Invoices({ merchant }) {
       return;
     }
 
-    async function loadInvoices() {
-      setLoading(true);
-      setError("");
-
-      try {
-        const result = await apiRequest("/api/invoices");
-        setInvoices(result.invoices || []);
-      } catch (err) {
-        setError(err.message || "Unable to load invoices.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadInvoices();
   }, [merchant]);
+
+  async function handleCreateInvoice(event) {
+    event.preventDefault();
+
+    setCreating(true);
+    setError("");
+
+    try {
+      await apiRequest("/api/invoices", {
+        method: "POST",
+        body: JSON.stringify({
+          invoiceNumber,
+          amount,
+          currency,
+          description
+        })
+      });
+
+      setInvoiceNumber("");
+      setAmount("");
+      setDescription("");
+
+      await loadInvoices();
+    } catch (err) {
+      setError(err.message || "Unable to create invoice.");
+    } finally {
+      setCreating(false);
+    }
+  }
 
   if (!merchant) {
     return (
@@ -42,19 +76,88 @@ export default function Invoices({ merchant }) {
     <section>
       <h2>Invoices</h2>
 
-      {loading && <p>Loading invoices...</p>}
+      <form onSubmit={handleCreateInvoice}>
+        <h3>Create Invoice</h3>
+
+        <div>
+          <label>
+            Invoice Number
+            <input
+              value={invoiceNumber}
+              onChange={(event) =>
+                setInvoiceNumber(event.target.value)
+              }
+              placeholder="INV-0001"
+              required
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Amount
+            <input
+              type="number"
+              min="0"
+              step="0.000001"
+              value={amount}
+              onChange={(event) =>
+                setAmount(event.target.value)
+              }
+              placeholder="10"
+              required
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Currency
+            <select
+              value={currency}
+              onChange={(event) =>
+                setCurrency(event.target.value)
+              }
+            >
+              <option value="USDC">USDC</option>
+              <option value="EURC">EURC</option>
+            </select>
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Description
+            <textarea
+              value={description}
+              onChange={(event) =>
+                setDescription(event.target.value)
+              }
+              placeholder="Payment for services"
+            />
+          </label>
+        </div>
+
+        <button type="submit" disabled={creating}>
+          {creating ? "Creating..." : "Create Invoice"}
+        </button>
+      </form>
 
       {error && <p role="alert">{error}</p>}
 
-      {!loading && !error && invoices.length === 0 && (
+      <h3>Payment Invoices</h3>
+
+      {loading && <p>Loading invoices...</p>}
+
+      {!loading && invoices.length === 0 && (
         <p>No invoices yet.</p>
       )}
 
-      {!loading && !error && invoices.length > 0 && (
+      {!loading && invoices.length > 0 && (
         <div>
           {invoices.map((invoice) => (
             <article key={invoice.id}>
-              <h3>{invoice.invoice_number}</h3>
+              <h4>{invoice.invoice_number}</h4>
 
               <p>
                 {invoice.amount} {invoice.currency}
