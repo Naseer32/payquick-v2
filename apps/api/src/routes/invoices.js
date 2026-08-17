@@ -8,12 +8,13 @@ const router = Router();
 router.post("/", requireAuth, async (req, res) => {
   try {
     const {
-      invoiceNumber,
-      amount,
-      currency,
-      description,
-      dueAt
-    } = req.body;
+  customerId,
+  invoiceNumber,
+  amount,
+  currency,
+  description,
+  dueAt
+} = req.body;
 
     const merchantResult = await query(
       `
@@ -33,13 +34,14 @@ router.post("/", requireAuth, async (req, res) => {
     }
 
     const invoice = await createInvoice({
-      merchantId: merchantResult.rows[0].id,
-      invoiceNumber,
-      amount,
-      currency,
-      description,
-      dueAt
-    });
+  merchantId: merchantResult.rows[0].id,
+  customerId,
+  invoiceNumber,
+  amount,
+  currency,
+  description,
+  dueAt
+});
 
     res.status(201).json({
       ok: true,
