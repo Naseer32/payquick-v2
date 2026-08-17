@@ -33,3 +33,19 @@ export async function getChainId() {
 export function isArcTestnet(chainId) {
   return Number.parseInt(chainId, 16) === ARC_TESTNET_CHAIN_ID;
 }
+export async function signMessage(message) {
+  const provider = getEthereumProvider();
+
+  const accounts = await provider.request({
+    method: "eth_requestAccounts"
+  });
+
+  if (!accounts?.length) {
+    throw new Error("No wallet account returned");
+  }
+
+  return provider.request({
+    method: "personal_sign",
+    params: [message, accounts[0]]
+  });
+}
