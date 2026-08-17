@@ -53,9 +53,12 @@ router.post("/verify", (req, res) => {
   try {
     const {
       walletAddress,
-      message,
       signature
     } = req.body;
+
+    const challenge = consumeChallenge(walletAddress);
+
+    const message = challenge.nonce;
 
     const valid = verifyWalletSignature(
       walletAddress,
