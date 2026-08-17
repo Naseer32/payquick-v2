@@ -3,6 +3,8 @@ import { apiRequest } from "../services/api.js";
 
 export default function Invoices({ merchant }) {
   const [invoices, setInvoices] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [customerId, setCustomerId] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("USDC");
@@ -25,13 +27,24 @@ export default function Invoices({ merchant }) {
     }
   }
 
+  async function loadCustomers() {
+    try {
+      const result = await apiRequest("/api/customers");
+      setCustomers(result.customers || []);
+    } catch (err) {
+      setError(err.message || "Unable to load customers.");
+    }
+  }
+
   useEffect(() => {
     if (!merchant) {
       setInvoices([]);
+      setCustomers([]);
       return;
     }
 
     loadInvoices();
+    loadCustomers();
   }, [merchant]);
 
   async function handleCreateInvoice(event) {
@@ -44,6 +57,7 @@ export default function Invoices({ merchant }) {
       await apiRequest("/api/invoices", {
         method: "POST",
         body: JSON.stringify({
+          customerId: customerId || null,
           invoiceNumber,
           amount,
           currency,
@@ -51,6 +65,7 @@ export default function Invoices({ merchant }) {
         })
       });
 
+      setCustomerId("");
       setInvoiceNumber("");
       setAmount("");
       setDescription("");
@@ -78,6 +93,29 @@ export default function Invoices({ merchant }) {
 
       <form onSubmit={handleCreateInvoice}>
         <h3>Create Invoice</h3>
+
+        <div>
+          <label>
+            Customer
+            <select
+              value={customerId}
+              onChange={(event) =>
+                setCustomerId(event.target.value)
+              }
+            >
+              <option value="">No customer</option>
+
+              {customers.map((customer) => (
+                <option
+                  key={customer.id}
+                  value={customer.id}
+                >
+                  {customer.name || customer.email || "Unnamed customer"}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <div>
           <label>
@@ -170,19 +208,19 @@ export default function Invoices({ merchant }) {
               )}
 
               <p>
-  Checkout:{" "}
-  <a
-    href={`/pay/${encodeURIComponent(invoice.checkout_token)}`}
-    target="_blank"
-    rel="noreferrer"
-  >
-    Open checkout
-  </a>
-</p>
+                Checkout:{" "}
+                <a
+                  href={`/pay/${encodeURIComponent(invoice.checkout_token)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open checkout
+                </a>
+              </p>
             </article>
           ))}
         </div>
       )}
     </section>
   );
-}
+              }
