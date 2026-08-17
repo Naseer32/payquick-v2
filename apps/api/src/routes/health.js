@@ -1,0 +1,13 @@
+import { Router } from "express";
+
+const router = Router();
+
+router.get("/", (_req, res) => {
+  res.json({
+    ok: true,
+    service: "payquick-api",
+    network: "Arc Testnet"
+  });
+});
+
+export default router;
