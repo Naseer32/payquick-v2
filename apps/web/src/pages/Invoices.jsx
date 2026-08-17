@@ -170,10 +170,15 @@ export default function Invoices({ merchant }) {
               )}
 
               <p>
-                Checkout:
-                {" "}
-                /pay/{invoice.checkout_token}
-              </p>
+  Checkout:{" "}
+  <a
+    href={`/pay/${encodeURIComponent(invoice.checkout_token)}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    Open checkout
+  </a>
+</p>
             </article>
           ))}
         </div>
