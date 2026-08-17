@@ -53,4 +53,40 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/", requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `
+        SELECT
+          i.id,
+          i.invoice_number,
+          i.amount,
+          i.currency,
+          i.description,
+          i.status,
+          i.checkout_token,
+          i.due_at,
+          i.paid_at,
+          i.created_at
+        FROM invoices i
+        JOIN merchants m
+          ON m.id = i.merchant_id
+        WHERE m.wallet_address = $1
+        ORDER BY i.created_at DESC
+      `,
+      [req.auth.walletAddress]
+    );
+
+    res.json({
+      ok: true,
+      invoices: result.rows
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
 export default router;
