@@ -3,6 +3,7 @@ import { query } from "../db/database.js";
 
 export async function createInvoice({
   merchantId,
+  customerId,
   invoiceNumber,
   amount,
   currency,
@@ -31,16 +32,17 @@ export async function createInvoice({
   const result = await query(
     `
       INSERT INTO invoices (
-        id,
-        merchant_id,
-        invoice_number,
-        amount,
-        currency,
-        description,
-        checkout_token,
-        due_at
-      )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+  id,
+  merchant_id,
+  customer_id,
+  invoice_number,
+  amount,
+  currency,
+  description,
+  checkout_token,
+  due_at
+)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING
         id,
         merchant_id,
@@ -54,16 +56,17 @@ export async function createInvoice({
         paid_at,
         created_at
     `,
-    [
-      id,
-      merchantId,
-      invoiceNumber,
-      amount,
-      currency,
-      description || null,
-      checkoutToken,
-      dueAt || null
-    ]
+      [
+  id,
+  merchantId,
+  customerId || null,
+  invoiceNumber,
+  amount,
+  currency,
+  description || null,
+  checkoutToken,
+  dueAt || null
+]
   );
 
   return result.rows[0];
