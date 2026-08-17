@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { authenticateWallet } from "../services/auth.js";
 
-export default function WalletButton() {
+export default function WalletButton({ onAuthenticated }) {
   const [account, setAccount] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,6 +12,7 @@ export default function WalletButton() {
 
     try {
       const result = await authenticateWallet();
+      onAuthenticated?.(result.merchant);
       setAccount(result.walletAddress);
     } catch (err) {
       setError(err.message || "Unable to authenticate wallet");
