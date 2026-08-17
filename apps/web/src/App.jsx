@@ -8,6 +8,18 @@ import WalletButton from "./components/WalletButton.jsx";
 export default function App() {
   const [merchant, setMerchant] = useState(null);
 
+  const path = window.location.pathname;
+
+  if (path.startsWith("/pay/")) {
+    const checkoutToken = path.slice("/pay/".length);
+
+    return (
+      <main>
+        <Checkout checkoutToken={checkoutToken} />
+      </main>
+    );
+  }
+
   return (
     <main>
       <header>
@@ -18,7 +30,6 @@ export default function App() {
 
       <Dashboard merchant={merchant} />
       <Invoices merchant={merchant} />
-      <Checkout merchant={merchant} />
       <Customers merchant={merchant} />
     </main>
   );
