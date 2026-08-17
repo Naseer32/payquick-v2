@@ -37,12 +37,13 @@ router.post("/challenge", (req, res) => {
 router.post("/merchant", requireAuth, async (req, res) => {
     const { walletAddress } = req.body;
 
-    const merchant = await getOrCreateMerchant(walletAddress);
+    const result = await getOrCreateMerchant(walletAddress);
 
-    res.json({
-      ok: true,
-      merchant
-    });
+res.json({
+  ok: true,
+  merchant: result.merchant,
+  created: result.created
+});
   } catch (error) {
     res.status(400).json({
       ok: false,
