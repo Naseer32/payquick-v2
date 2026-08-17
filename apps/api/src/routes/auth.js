@@ -1,3 +1,4 @@
+import { requireAuth } from "../middleware/authMiddleware.js";
 import { Router } from "express";
 import { getOrCreateMerchant } from "../services/merchantService.js";
 import {
@@ -33,8 +34,7 @@ router.post("/challenge", (req, res) => {
   }
 });
 
-router.post("/merchant", async (req, res) => {
-  try {
+router.post("/merchant", requireAuth, async (req, res) => {
     const { walletAddress } = req.body;
 
     const merchant = await getOrCreateMerchant(walletAddress);
