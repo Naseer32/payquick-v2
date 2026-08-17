@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { connectWallet } from "../services/blockchain.js";
+import {
+  connectWallet,
+  getChainId,
+  isArcTestnet
+} from "../services/blockchain.js";
 
 export default function WalletButton() {
   const [account, setAccount] = useState("");
@@ -10,6 +14,14 @@ export default function WalletButton() {
 
     try {
       const address = await connectWallet();
+      const chainId = await getChainId();
+
+      if (!isArcTestnet(chainId)) {
+        setAccount("");
+        setError("Please switch your wallet to Arc Testnet.");
+        return;
+      }
+
       setAccount(address);
     } catch (err) {
       setError(err.message || "Unable to connect wallet");
