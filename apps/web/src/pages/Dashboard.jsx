@@ -1,8 +1,15 @@
-export default function Dashboard() {
+export default function Dashboard({ merchant }) {
   return (
     <section>
       <h2>Dashboard</h2>
-      <p>PayQuick merchant dashboard</p>
+
+      {merchant ? (
+        <p>
+          Merchant wallet: {merchant.wallet_address}
+        </p>
+      ) : (
+        <p>Connect your wallet to access your merchant dashboard.</p>
+      )}
     </section>
   );
 }
