@@ -88,5 +88,48 @@ router.get("/", requireAuth, async (req, res) => {
     });
   }
 });
+router.get("/:id", requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `
+        SELECT
+          i.id,
+          i.invoice_number,
+          i.amount,
+          i.currency,
+          i.description,
+          i.status,
+          i.checkout_token,
+          i.due_at,
+          i.paid_at,
+          i.created_at
+        FROM invoices i
+        JOIN merchants m
+          ON m.id = i.merchant_id
+        WHERE i.id = $1
+          AND m.wallet_address = $2
+        LIMIT 1
+      `,
+      [req.params.id, req.auth.walletAddress]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Invoice not found"
+      });
+    }
+
+    res.json({
+      ok: true,
+      invoice: result.rows[0]
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 
 export default router;
