@@ -5,6 +5,7 @@ import {
   consumeChallenge
 } from "../services/authService.js";
 import { verifyWalletSignature } from "../services/signatureService.js";
+import { createSession } from "../services/sessionService.js";
 
 const router = Router();
 
@@ -58,11 +59,9 @@ router.post("/verify", (req, res) => {
 
     const challenge = consumeChallenge(walletAddress);
 
-    const message = challenge.nonce;
-
     const valid = verifyWalletSignature(
       walletAddress,
-      message,
+      challenge.nonce,
       signature
     );
 
@@ -73,10 +72,13 @@ router.post("/verify", (req, res) => {
       });
     }
 
+    const sessionToken = createSession(walletAddress);
+
     res.json({
       ok: true,
       authenticated: true,
-      walletAddress
+      walletAddress,
+      sessionToken
     });
   } catch (error) {
     res.status(400).json({
@@ -85,5 +87,4 @@ router.post("/verify", (req, res) => {
     });
   }
 });
-
 export default router;
