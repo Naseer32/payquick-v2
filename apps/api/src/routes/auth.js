@@ -4,6 +4,7 @@ import {
   createChallenge,
   consumeChallenge
 } from "../services/authService.js";
+import { verifyWalletSignature } from "../services/signatureService.js";
 
 const router = Router();
 
@@ -40,6 +41,39 @@ router.post("/merchant", async (req, res) => {
     res.json({
       ok: true,
       merchant
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+router.post("/verify", (req, res) => {
+  try {
+    const {
+      walletAddress,
+      message,
+      signature
+    } = req.body;
+
+    const valid = verifyWalletSignature(
+      walletAddress,
+      message,
+      signature
+    );
+
+    if (!valid) {
+      return res.status(401).json({
+        ok: false,
+        error: "Invalid wallet signature"
+      });
+    }
+
+    res.json({
+      ok: true,
+      authenticated: true,
+      walletAddress
     });
   } catch (error) {
     res.status(400).json({
