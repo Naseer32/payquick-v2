@@ -62,9 +62,11 @@ router.post("/verify", (req, res) => {
 
     const challenge = consumeChallenge(normalizedAddress);
 
+    const message = `Sign in to PayQuick\n\nNonce: ${challenge.nonce}`;
+
     const valid = verifyWalletSignature(
       normalizedAddress,
-      challenge.nonce,
+      message,
       signature
     );
 
