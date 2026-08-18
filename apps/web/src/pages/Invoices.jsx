@@ -158,7 +158,6 @@ export default function Invoices({ merchant }) {
               }
             >
               <option value="USDC">USDC</option>
-              <option value="EURC">EURC</option>
             </select>
           </label>
         </div>
