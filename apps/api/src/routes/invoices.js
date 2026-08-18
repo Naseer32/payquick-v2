@@ -59,23 +59,32 @@ router.get("/", requireAuth, async (req, res) => {
   try {
     const result = await query(
       `
-        SELECT
-          i.id,
-          i.invoice_number,
-          i.amount,
-          i.currency,
-          i.description,
-          i.status,
-          i.checkout_token,
-          i.due_at,
-          i.paid_at,
-          i.created_at
-        FROM invoices i
-        JOIN merchants m
-          ON m.id = i.merchant_id
-        WHERE m.wallet_address = $1
-        ORDER BY i.created_at DESC
-      `,
+        const result = await query(
+  `
+    SELECT
+      i.id,
+      i.invoice_number,
+      i.amount,
+      i.currency,
+      i.description,
+      i.status,
+      i.checkout_token,
+      i.due_at,
+      i.paid_at,
+      i.created_at,
+      c.id AS customer_id,
+      c.name AS customer_name,
+      c.email AS customer_email
+    FROM invoices i
+    JOIN merchants m
+      ON m.id = i.merchant_id
+    LEFT JOIN customers c
+      ON c.id = i.customer_id
+    WHERE m.wallet_address = $1
+    ORDER BY i.created_at DESC
+  `,
+  [req.auth.walletAddress]
+);
       [req.auth.walletAddress]
     );
 
