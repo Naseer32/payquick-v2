@@ -4,8 +4,7 @@ export const NETWORK = {
 };
 
 export const CURRENCIES = {
-  USDC: "USDC",
-  EURC: "EURC"
+  USDC: "USDC"
 };
 
 export const INVOICE_STATUS = {
