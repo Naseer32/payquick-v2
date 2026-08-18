@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { query } from "../db/database.js";
+import { CURRENCIES } from "../../../../packages/shared/constants.js";
 
 export async function createInvoice({
   merchantId,
@@ -18,12 +19,14 @@ export async function createInvoice({
     throw new Error("Invoice number is required");
   }
 
-  if (!amount) {
-    throw new Error("Invoice amount is required");
+  const numericAmount = Number(amount);
+
+  if (!amount || Number.isNaN(numericAmount) || numericAmount <= 0) {
+    throw new Error("Invoice amount must be a positive number");
   }
 
-  if (!currency) {
-    throw new Error("Invoice currency is required");
+  if (!currency || !Object.values(CURRENCIES).includes(currency)) {
+    throw new Error("Invoice currency is not supported");
   }
 
   const id = randomUUID();
@@ -32,16 +35,16 @@ export async function createInvoice({
   const result = await query(
     `
       INSERT INTO invoices (
-  id,
-  merchant_id,
-  customer_id,
-  invoice_number,
-  amount,
-  currency,
-  description,
-  checkout_token,
-  due_at
-)
+        id,
+        merchant_id,
+        customer_id,
+        invoice_number,
+        amount,
+        currency,
+        description,
+        checkout_token,
+        due_at
+      )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING
         id,
@@ -56,17 +59,17 @@ export async function createInvoice({
         paid_at,
         created_at
     `,
-      [
-  id,
-  merchantId,
-  customerId || null,
-  invoiceNumber,
-  amount,
-  currency,
-  description || null,
-  checkoutToken,
-  dueAt || null
-]
+    [
+      id,
+      merchantId,
+      customerId || null,
+      invoiceNumber,
+      numericAmount,
+      currency,
+      description || null,
+      checkoutToken,
+      dueAt || null
+    ]
   );
 
   return result.rows[0];
