@@ -35,15 +35,16 @@ router.post("/challenge", (req, res) => {
 });
 
 router.post("/merchant", requireAuth, async (req, res) => {
-    const { walletAddress } = req.body;
+  try {
+    const walletAddress = req.auth.walletAddress;
 
     const result = await getOrCreateMerchant(walletAddress);
 
-res.json({
-  ok: true,
-  merchant: result.merchant,
-  created: result.created
-});
+    res.json({
+      ok: true,
+      merchant: result.merchant,
+      created: result.created
+    });
   } catch (error) {
     res.status(400).json({
       ok: false,
