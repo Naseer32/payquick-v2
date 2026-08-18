@@ -26,7 +26,8 @@ export async function authenticateWallet() {
     })
   });
 
-  const signature = await signMessage(challenge.nonce);
+  const message = `Sign in to PayQuick\n\nNonce: ${challenge.nonce}`;
+  const signature = await signMessage(message);
 
   const verification = await apiRequest("/api/auth/verify", {
     method: "POST",
