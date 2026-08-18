@@ -203,6 +203,21 @@ export default function Invoices({ merchant }) {
 
               <p>Status: {invoice.status}</p>
 
+              {invoice.customer_id ? (
+                <div>
+                  <p>
+                    Customer:{" "}
+                    {invoice.customer_name || "Unnamed customer"}
+                  </p>
+
+                  {invoice.customer_email && (
+                    <p>Email: {invoice.customer_email}</p>
+                  )}
+                </div>
+              ) : (
+                <p>Customer: None</p>
+              )}
+
               {invoice.description && (
                 <p>{invoice.description}</p>
               )}
@@ -223,4 +238,4 @@ export default function Invoices({ merchant }) {
       )}
     </section>
   );
-              }
+          }
