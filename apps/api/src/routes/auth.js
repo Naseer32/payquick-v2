@@ -15,15 +15,17 @@ router.get("/status", (_req, res) => {
     authenticated: false
   });
 });
+
 router.post("/challenge", (req, res) => {
   try {
     const { walletAddress } = req.body;
+    const normalizedAddress = walletAddress?.toLowerCase();
 
-    const nonce = createChallenge(walletAddress);
+    const nonce = createChallenge(normalizedAddress);
 
     res.json({
       ok: true,
-      walletAddress,
+      walletAddress: normalizedAddress,
       nonce
     });
   } catch (error) {
@@ -52,17 +54,16 @@ router.post("/merchant", requireAuth, async (req, res) => {
     });
   }
 });
+
 router.post("/verify", (req, res) => {
   try {
-    const {
-      walletAddress,
-      signature
-    } = req.body;
+    const { walletAddress, signature } = req.body;
+    const normalizedAddress = walletAddress?.toLowerCase();
 
-    const challenge = consumeChallenge(walletAddress);
+    const challenge = consumeChallenge(normalizedAddress);
 
     const valid = verifyWalletSignature(
-      walletAddress,
+      normalizedAddress,
       challenge.nonce,
       signature
     );
@@ -74,12 +75,12 @@ router.post("/verify", (req, res) => {
       });
     }
 
-    const sessionToken = createSession(walletAddress);
+    const sessionToken = createSession(normalizedAddress);
 
     res.json({
       ok: true,
       authenticated: true,
-      walletAddress,
+      walletAddress: normalizedAddress,
       sessionToken
     });
   } catch (error) {
@@ -89,4 +90,5 @@ router.post("/verify", (req, res) => {
     });
   }
 });
+
 export default router;
