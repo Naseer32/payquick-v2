@@ -7,40 +7,28 @@ export async function getOrCreateMerchant(walletAddress) {
   }
 
   const normalizedAddress = walletAddress.toLowerCase();
-
-  const existing = await query(
-    `
-      SELECT id, wallet_address, display_name, created_at
-      FROM merchants
-      WHERE wallet_address = $1
-      LIMIT 1
-    `,
-    [normalizedAddress]
-  );
-
-  if (existing.rows.length > 0) {
-    return {
-      merchant: existing.rows[0],
-      created: false
-    };
-  }
-
   const id = randomUUID();
 
-  const created = await query(
+  const result = await query(
     `
-      INSERT INTO merchants (
-        id,
-        wallet_address
-      )
+      INSERT INTO merchants (id, wallet_address)
       VALUES ($1, $2)
-      RETURNING id, wallet_address, display_name, created_at
+      ON CONFLICT (wallet_address)
+        DO UPDATE SET wallet_address = EXCLUDED.wallet_address
+      RETURNING id, wallet_address, display_name, created_at, (xmax = 0) AS inserted
     `,
     [id, normalizedAddress]
   );
 
+  const row = result.rows[0];
+
   return {
-    merchant: created.rows[0],
-    created: true
+    merchant: {
+      id: row.id,
+      wallet_address: row.wallet_address,
+      display_name: row.display_name,
+      created_at: row.created_at
+    },
+    created: row.inserted
   };
 }
