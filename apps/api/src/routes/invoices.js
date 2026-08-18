@@ -8,13 +8,13 @@ const router = Router();
 router.post("/", requireAuth, async (req, res) => {
   try {
     const {
-  customerId,
-  invoiceNumber,
-  amount,
-  currency,
-  description,
-  dueAt
-} = req.body;
+      customerId,
+      invoiceNumber,
+      amount,
+      currency,
+      description,
+      dueAt
+    } = req.body;
 
     const merchantResult = await query(
       `
@@ -34,14 +34,14 @@ router.post("/", requireAuth, async (req, res) => {
     }
 
     const invoice = await createInvoice({
-  merchantId: merchantResult.rows[0].id,
-  customerId,
-  invoiceNumber,
-  amount,
-  currency,
-  description,
-  dueAt
-});
+      merchantId: merchantResult.rows[0].id,
+      customerId,
+      invoiceNumber,
+      amount,
+      currency,
+      description,
+      dueAt
+    });
 
     res.status(201).json({
       ok: true,
@@ -59,32 +59,28 @@ router.get("/", requireAuth, async (req, res) => {
   try {
     const result = await query(
       `
-        const result = await query(
-  `
-    SELECT
-      i.id,
-      i.invoice_number,
-      i.amount,
-      i.currency,
-      i.description,
-      i.status,
-      i.checkout_token,
-      i.due_at,
-      i.paid_at,
-      i.created_at,
-      c.id AS customer_id,
-      c.name AS customer_name,
-      c.email AS customer_email
-    FROM invoices i
-    JOIN merchants m
-      ON m.id = i.merchant_id
-    LEFT JOIN customers c
-      ON c.id = i.customer_id
-    WHERE m.wallet_address = $1
-    ORDER BY i.created_at DESC
-  `,
-  [req.auth.walletAddress]
-);
+        SELECT
+          i.id,
+          i.invoice_number,
+          i.amount,
+          i.currency,
+          i.description,
+          i.status,
+          i.checkout_token,
+          i.due_at,
+          i.paid_at,
+          i.created_at,
+          c.id AS customer_id,
+          c.name AS customer_name,
+          c.email AS customer_email
+        FROM invoices i
+        JOIN merchants m
+          ON m.id = i.merchant_id
+        LEFT JOIN customers c
+          ON c.id = i.customer_id
+        WHERE m.wallet_address = $1
+        ORDER BY i.created_at DESC
+      `,
       [req.auth.walletAddress]
     );
 
@@ -99,6 +95,7 @@ router.get("/", requireAuth, async (req, res) => {
     });
   }
 });
+
 router.get("/:id", requireAuth, async (req, res) => {
   try {
     const result = await query(
@@ -113,10 +110,15 @@ router.get("/:id", requireAuth, async (req, res) => {
           i.checkout_token,
           i.due_at,
           i.paid_at,
-          i.created_at
+          i.created_at,
+          c.id AS customer_id,
+          c.name AS customer_name,
+          c.email AS customer_email
         FROM invoices i
         JOIN merchants m
           ON m.id = i.merchant_id
+        LEFT JOIN customers c
+          ON c.id = i.customer_id
         WHERE i.id = $1
           AND m.wallet_address = $2
         LIMIT 1
