@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { query } from "../db/database.js";
-import { CURRENCIES } from "../../../../packages/shared/constants.js";
+import { CURRENCIES } from "../constants.js";
 
 export async function createInvoice({
   merchantId,
