@@ -1,8 +1,10 @@
 const ARC_TESTNET_CHAIN_ID = 5042002;
 
 export function getEthereumProvider() {
-  if (!window.ethereum) {
-    throw new Error("No compatible wallet found");
+  if (typeof window === "undefined" || !window.ethereum) {
+    throw new Error(
+      "No compatible wallet found. Please install or open MetaMask."
+    );
   }
 
   return window.ethereum;
@@ -15,8 +17,8 @@ export async function connectWallet() {
     method: "eth_requestAccounts"
   });
 
-  if (!accounts?.length) {
-    throw new Error("No wallet account returned");
+  if (!Array.isArray(accounts) || accounts.length === 0) {
+    throw new Error("No wallet account returned.");
   }
 
   return accounts[0];
@@ -33,19 +35,16 @@ export async function getChainId() {
 export function isArcTestnet(chainId) {
   return Number.parseInt(chainId, 16) === ARC_TESTNET_CHAIN_ID;
 }
-export async function signMessage(message) {
+
+export async function signMessage(message, walletAddress) {
   const provider = getEthereumProvider();
 
-  const accounts = await provider.request({
-    method: "eth_requestAccounts"
-  });
-
-  if (!accounts?.length) {
-    throw new Error("No wallet account returned");
+  if (!walletAddress) {
+    throw new Error("Wallet address is required to sign the message.");
   }
 
   return provider.request({
     method: "personal_sign",
-    params: [message, accounts[0]]
+    params: [message, walletAddress]
   });
 }
