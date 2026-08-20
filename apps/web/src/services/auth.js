@@ -12,41 +12,62 @@ import {
 } from "./blockchain.js";
 
 export async function authenticateWallet() {
-  const walletAddress = await connectWallet();
-  const chainId = await getChainId();
+  try {
+    const walletAddress = await connectWallet();
+    console.log("PayQuick: wallet connected", walletAddress);
 
-  if (!isArcTestnet(chainId)) {
-    throw new Error("Please switch your wallet to Arc Testnet.");
-  }
+    const chainId = await getChainId();
+    console.log("PayQuick: chain ID", chainId);
 
-  const challenge = await apiRequest("/api/auth/challenge", {
-    method: "POST",
-    body: JSON.stringify({
-      walletAddress
-    })
-  });
+    if (!isArcTestnet(chainId)) {
+      throw new Error("Please switch your wallet to Arc Testnet.");
+    }
 
-  const message = `Sign in to PayQuick\n\nNonce: ${challenge.nonce}`;
-  const signature = await signMessage(message, walletAddress);
+    console.log("PayQuick: requesting challenge");
 
-  const verification = await apiRequest("/api/auth/verify", {
-    method: "POST",
-    body: JSON.stringify({
+    const challenge = await apiRequest("/api/auth/challenge", {
+      method: "POST",
+      body: JSON.stringify({
+        walletAddress
+      })
+    });
+
+    console.log("PayQuick: challenge received");
+
+    const message = `Sign in to PayQuick\n\nNonce: ${challenge.nonce}`;
+
+    console.log("PayQuick: requesting wallet signature");
+
+    const signature = await signMessage(message, walletAddress);
+
+    console.log("PayQuick: signature received");
+
+    const verification = await apiRequest("/api/auth/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        walletAddress,
+        signature
+      })
+    });
+
+    console.log("PayQuick: signature verified");
+
+    saveSession(verification.sessionToken);
+
+    const merchantResult = await apiRequest("/api/auth/merchant", {
+      method: "POST"
+    });
+
+    console.log("PayQuick: merchant loaded");
+
+    return {
       walletAddress,
-      signature
-    })
-  });
-
-  saveSession(verification.sessionToken);
-
-  const merchantResult = await apiRequest("/api/auth/merchant", {
-    method: "POST"
-  });
-
-  return {
-    walletAddress,
-    merchant: merchantResult.merchant
-  };
+      merchant: merchantResult.merchant
+    };
+  } catch (error) {
+    console.error("PayQuick authentication failed:", error);
+    throw error;
+  }
 }
 
 export function logout() {
