@@ -28,7 +28,28 @@ router.post("/challenge", (req, res) => {
       walletAddress: normalizedAddress,
       nonce
     });
-      } catch (error) {
+  } catch (error) {
+    console.error("PayQuick challenge error:", error);
+
+    res.status(400).json({
+      ok: false,
+      error: error?.message || "Failed to create authentication challenge"
+    });
+  }
+});
+
+router.post("/merchant", requireAuth, async (req, res) => {
+  try {
+    const walletAddress = req.auth.walletAddress;
+
+    const result = await getOrCreateMerchant(walletAddress);
+
+    res.json({
+      ok: true,
+      merchant: result.merchant,
+      created: result.created
+    });
+  } catch (error) {
     console.error("PayQuick merchant authentication error:", error);
 
     res.status(500).json({
@@ -43,24 +64,6 @@ router.post("/challenge", (req, res) => {
         code: error?.code || null,
         message: error?.message || null
       }
-    });
-  }
-
-router.post("/merchant", requireAuth, async (req, res) => {
-  try {
-    const walletAddress = req.auth.walletAddress;
-
-    const result = await getOrCreateMerchant(walletAddress);
-
-    res.json({
-      ok: true,
-      merchant: result.merchant,
-      created: result.created
-    });
-  } catch (error) {
-    res.status(400).json({
-      ok: false,
-      error: error.message
     });
   }
 });
@@ -96,9 +99,11 @@ router.post("/verify", (req, res) => {
       sessionToken
     });
   } catch (error) {
+    console.error("PayQuick verification error:", error);
+
     res.status(400).json({
       ok: false,
-      error: error.message
+      error: error?.message || "Wallet verification failed"
     });
   }
 });
