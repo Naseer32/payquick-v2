@@ -1,5 +1,5 @@
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+  import.meta.env.VITE_API_URL || "https://payquick-v2.onrender.com";
 
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("payquick_session");
