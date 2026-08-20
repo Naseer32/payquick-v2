@@ -43,8 +43,10 @@ export async function signMessage(message, walletAddress) {
     throw new Error("Wallet address is required to sign the message.");
   }
 
+  const normalizedAddress = walletAddress.toLowerCase();
+
   return provider.request({
     method: "personal_sign",
-    params: [message, walletAddress]
+    params: [message, normalizedAddress]
   });
 }
