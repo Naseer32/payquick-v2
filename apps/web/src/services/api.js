@@ -30,8 +30,11 @@ export async function apiRequest(path, options = {}) {
       const error = await response.json().catch(() => null);
 
       throw new Error(
-        error?.error || `API request failed: ${response.status}`
-      );
+  error?.error ||
+  error?.detail?.message ||
+  error?.detail?.code ||
+  `API request failed: ${response.status}`
+);
     }
 
     return response.json();
