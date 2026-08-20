@@ -28,10 +28,12 @@ router.post("/challenge", (req, res) => {
       walletAddress: normalizedAddress,
       nonce
     });
-  } catch (error) {
-    res.status(400).json({
+    } catch (error) {
+    console.error("PayQuick merchant authentication error:", error);
+
+    res.status(500).json({
       ok: false,
-      error: error.message
+      error: error.message || "Merchant authentication failed"
     });
   }
 });
