@@ -3,29 +3,46 @@ const API_URL =
 
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("payquick_session");
+  const url = `${API_URL}${path}`;
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token
-        ? {
-            Authorization: `Bearer ${token}`
-          }
-        : {}),
-      ...(options.headers || {})
-    }
+  console.log("PayQuick API request:", {
+    url,
+    method: options.method || "GET"
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => null);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`
+            }
+          : {}),
+        ...(options.headers || {})
+      }
+    });
 
-    throw new Error(
-      error?.error || `API request failed: ${response.status}`
-    );
+    console.log("PayQuick API response:", response.status, url);
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null);
+
+      throw new Error(
+        error?.error || `API request failed: ${response.status}`
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("PayQuick API request failed:", {
+      url,
+      error
+    });
+
+    throw error;
   }
-
-  return response.json();
 }
 
 export function saveSession(token) {
