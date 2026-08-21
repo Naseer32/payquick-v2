@@ -17,7 +17,8 @@ router.get("/:token", async (req, res) => {
           i.due_at,
           i.paid_at,
           i.created_at,
-          m.display_name
+          m.display_name,
+          m.wallet_address
         FROM invoices i
         JOIN merchants m
           ON m.id = i.merchant_id
