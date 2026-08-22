@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../services/api.js";
 
-const ARC_TESTNET_CHAIN_ID = "0x4cef52"; // 5042002
-const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
-const USDC_DECIMALS = 6;
+const ARC_TESTNET_CHAIN_ID = "0x4cef52";
 
-function encodeTransfer(toAddress, amount) {
-  const methodId = "a9059cbb";
-  const cleanTo = toAddress.replace("0x", "").toLowerCase().padStart(64, "0");
-  const amountHex = BigInt(amount).toString(16).padStart(64, "0");
-  return "0x" + methodId + cleanTo + amountHex;
-}
+const PAYMENT_TRACKER_ADDRESS =
+  "0xd0c5f3e9570CcA0E9913522905b164304A692166";
+
+const PAYMENT_TRACKER_ABI = [
+  "function sendPayment(address to, string memo) external payable"
+];
 
 export default function Checkout({ checkoutToken }) {
   const [checkout, setCheckout] = useState(null);
