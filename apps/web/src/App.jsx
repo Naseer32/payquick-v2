@@ -3,6 +3,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Invoices from "./pages/Invoices.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import Customers from "./pages/Customers.jsx";
+import Payments from "./pages/Payments.jsx";
 import WalletButton from "./components/WalletButton.jsx";
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
 
       <Dashboard merchant={merchant} />
       <Invoices merchant={merchant} />
+      <Payments merchant={merchant} />
       <Customers merchant={merchant} />
     </main>
   );
