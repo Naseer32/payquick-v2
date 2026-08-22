@@ -186,8 +186,8 @@ export default function Checkout({ checkoutToken }) {
 
       <p>Invoice: {checkout.invoice_number}</p>
       <p>
-        Amount: {checkout.amount} {checkout.currency}
-      </p>
+  Amount: {Number(checkout.amount)} {checkout.currency}
+</p>
 
       {checkout.description && <p>{checkout.description}</p>}
 
