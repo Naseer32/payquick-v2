@@ -34,6 +34,22 @@ export default function Customers({ merchant }) {
     loadCustomers();
   }, [merchant]);
 
+  async function handleViewHistory(customerId) {
+    setLoadingHistoryId(customerId);
+
+    try {
+      const result = await apiRequest(`/api/customers/${customerId}/payments`);
+      setHistoryByCustomer((prev) => ({
+        ...prev,
+        [customerId]: result.history || []
+      }));
+    } catch (err) {
+      setError(err.message || "Unable to load customer history.");
+    } finally {
+      setLoadingHistoryId(null);
+    }
+  }
+
   async function handleCreateCustomer(event) {
     event.preventDefault();
 
