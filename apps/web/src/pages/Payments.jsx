@@ -8,16 +8,23 @@ export default function Payments({ merchant }) {
   const [error, setError] = useState("");
 
   async function loadPayments() {
+    const requestId = ++loadPaymentsRequestId.current;
     setLoading(true);
     setError("");
 
     try {
       const result = await apiRequest("/api/payments");
-      setPayments(result.payments || []);
+      if (requestId === loadPaymentsRequestId.current) {
+        setPayments(result.payments || []);
+      }
     } catch (err) {
-      setError(err.message || "Unable to load payments.");
+      if (requestId === loadPaymentsRequestId.current) {
+        setError(err.message || "Unable to load payments.");
+      }
     } finally {
-      setLoading(false);
+      if (requestId === loadPaymentsRequestId.current) {
+        setLoading(false);
+      }
     }
   }
 
