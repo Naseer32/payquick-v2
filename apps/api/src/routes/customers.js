@@ -74,4 +74,43 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/:id/payments", requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `
+        SELECT
+          i.id AS invoice_id,
+          i.invoice_number,
+          i.amount,
+          i.currency,
+          i.status AS invoice_status,
+          i.created_at AS invoice_created_at,
+          p.id AS payment_id,
+          p.tx_hash,
+          p.status AS payment_status,
+          p.confirmed_at
+        FROM invoices i
+        JOIN merchants m
+          ON m.id = i.merchant_id
+        LEFT JOIN payments p
+          ON p.invoice_id = i.id
+        WHERE m.wallet_address = $1
+          AND i.customer_id = $2
+        ORDER BY i.created_at DESC
+      `,
+      [req.auth.walletAddress, req.params.id]
+    );
+
+    res.json({
+      ok: true,
+      history: result.rows
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
 export default router;
