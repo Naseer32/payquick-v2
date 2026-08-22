@@ -67,7 +67,16 @@ export default function Payments({ merchant }) {
 
               <p>From: {payment.payer_address}</p>
 
-              <p>Tx: {payment.tx_hash}</p>
+              <p>
+  Tx:{" "}
+  <a
+    href={`https://testnet.arcscan.app/tx/${payment.tx_hash}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    {payment.tx_hash}
+  </a>
+</p>
 
               {payment.confirmed_at && (
                 <p>Confirmed: {new Date(payment.confirmed_at).toLocaleString()}</p>
