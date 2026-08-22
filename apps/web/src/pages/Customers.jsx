@@ -139,6 +139,36 @@ export default function Customers({ merchant }) {
               {customer.email && (
                 <p>{customer.email}</p>
               )}
+
+              <button
+                type="button"
+                onClick={() => handleViewHistory(customer.id)}
+                disabled={loadingHistoryId === customer.id}
+              >
+                {loadingHistoryId === customer.id
+                  ? "Loading..."
+                  : "View History"}
+              </button>
+
+              {historyByCustomer[customer.id] && (
+                <div>
+                  {historyByCustomer[customer.id].length === 0 && (
+                    <p>No invoices for this customer yet.</p>
+                  )}
+
+                  {historyByCustomer[customer.id].map((item) => (
+                    <div key={item.invoice_id}>
+                      <p>
+                        {item.invoice_number}: {item.amount} {item.currency}
+                      </p>
+                      <p>Invoice status: {item.invoice_status}</p>
+                      {item.payment_status && (
+                        <p>Payment status: {item.payment_status}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </article>
           ))}
         </div>
