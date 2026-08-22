@@ -211,8 +211,8 @@ export default function Invoices({ merchant }) {
               <h4>{invoice.invoice_number}</h4>
 
               <p>
-                {invoice.amount} {invoice.currency}
-              </p>
+  {Number(invoice.amount)} {invoice.currency}
+</p>
 
               <p>Status: {invoice.status}</p>
 
