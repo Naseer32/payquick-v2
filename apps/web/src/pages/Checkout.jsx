@@ -56,71 +56,90 @@ export default function Checkout({ checkoutToken }) {
   }, [paySuccess, checkout?.status]);
 
   async function handlePay() {
-    setPayError("");
-    setPaying(true);
+  setPayError("");
+  setPaying(true);
 
-    try {
-      if (!window.ethereum) {
-        throw new Error("No wallet found. Please open this page in Rabby or another Web3 browser.");
-      }
-
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts"
-      });
-      const payerAddress = accounts[0];
-
-      const currentChainId = await window.ethereum.request({
-        method: "eth_chainId"
-      });
-
-      if (currentChainId.toLowerCase() !== ARC_TESTNET_CHAIN_ID.toLowerCase()) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: ARC_TESTNET_CHAIN_ID }]
-        });
-      }
-
-      const merchantAddress = checkout.wallet_address;
-      if (!merchantAddress) {
-        throw new Error("Merchant wallet address missing from checkout data.");
-      }
-
-      const amountInBaseUnits = BigInt(
-  Math.round(Number(checkout.amount) * 10 ** 18)
-);
-
-const memo = `${checkout.description || "Payment"} [${checkout.invoice_number}]`;
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-
-const contract = new ethers.Contract(
-  PAYMENT_TRACKER_ADDRESS,
-  PAYMENT_TRACKER_ABI,
-  signer
-);
-
-const tx = await contract.sendPayment(
-  merchantAddress,
-  memo,
-  { value: amountInBaseUnits.toString() }
-);
-
-const receipt = await tx.wait();
-
-const txHash = receipt.transactionHash;
-
-      await apiRequest(`/api/checkout/${encodeURIComponent(checkoutToken)}/pay`, {
-        method: "POST",
-        body: JSON.stringify({ txHash, payerAddress })
-      });
-
-      setPaySuccess(true);
-    } catch (err) {
-      setPayError(err.message || "Payment failed.");
-    } finally {
-      setPaying(false);
+  try {
+    if (!window.ethereum) {
+      throw new Error(
+        "No wallet found. Please open this page in Rabby or another Web3 browser."
+      );
     }
+
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts"
+    });
+
+    const payerAddress = accounts[0];
+
+    const currentChainId = await window.ethereum.request({
+      method: "eth_chainId"
+    });
+
+    if (
+      currentChainId.toLowerCase() !==
+      ARC_TESTNET_CHAIN_ID.toLowerCase()
+    ) {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: ARC_TESTNET_CHAIN_ID }]
+      });
+    }
+
+    const merchantAddress = checkout.wallet_address;
+
+    if (!merchantAddress) {
+      throw new Error(
+        "Merchant wallet address missing from checkout data."
+      );
+    }
+
+    const amountInBaseUnits = ethers.parseUnits(
+      String(checkout.amount),
+      18
+    );
+
+    const memo = `${checkout.description || "Payment"} [${checkout.invoice_number}]`;
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+
+    const contract = new ethers.Contract(
+      PAYMENT_TRACKER_ADDRESS,
+      PAYMENT_TRACKER_ABI,
+      signer
+    );
+
+    const tx = await contract.sendPayment(
+      merchantAddress,
+      memo,
+      {
+        value: amountInBaseUnits
+      }
+    );
+
+    const receipt = await tx.wait();
+
+    const txHash = receipt.hash;
+
+    await apiRequest(
+      `/api/checkout/${encodeURIComponent(checkoutToken)}/pay`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          txHash,
+          payerAddress
+        })
+      }
+    );
+
+    setPaySuccess(true);
+  } catch (err) {
+    console.error(err);
+    setPayError(err.message || "Payment failed.");
+  } finally {
+    setPaying(false);
+  }
   }
 
   async function handleVerify() {
