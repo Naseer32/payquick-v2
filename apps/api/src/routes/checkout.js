@@ -60,9 +60,15 @@ router.post("/:token/pay", async (req, res) => {
 
     const invoiceResult = await query(
       `
-        SELECT i.id, i.amount, i.currency, i.status, m.wallet_address
+        SELECT
+          i.id,
+          i.amount,
+          i.currency,
+          i.status,
+          m.wallet_address
         FROM invoices i
-        JOIN merchants m ON m.id = i.merchant_id
+        JOIN merchants m
+          ON m.id = i.merchant_id
         WHERE i.checkout_token = $1
         LIMIT 1
       `,
@@ -70,21 +76,45 @@ router.post("/:token/pay", async (req, res) => {
     );
 
     if (invoiceResult.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: "Checkout not found" });
+      return res.status(404).json({
+        ok: false,
+        error: "Checkout not found"
+      });
     }
 
     const invoice = invoiceResult.rows[0];
 
     if (invoice.status !== "pending") {
-      return res.status(409).json({ ok: false, error: "Invoice is not pending" });
+      return res.status(409).json({
+        ok: false,
+        error: "Invoice is not pending"
+      });
     }
 
     const paymentResult = await query(
       `
         INSERT INTO payments
-          (id, invoice_id, tx_hash, payer_address, receiver_address, amount, currency, status)
+          (
+            id,
+            invoice_id,
+            tx_hash,
+            payer_address,
+            receiver_address,
+            amount,
+            currency,
+            status
+          )
         VALUES
-          (gen_random_uuid(), $1, $2, $3, $4, $5, $6, 'pending')
+          (
+            gen_random_uuid(),
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6,
+            'pending'
+          )
         RETURNING id
       `,
       [
@@ -100,16 +130,38 @@ router.post("/:token/pay", async (req, res) => {
     await query(
       `
         INSERT INTO payment_events
-          (id, payment_id, event_name, tx_hash, payload)
+          (
+            id,
+            payment_id,
+            event_name,
+            tx_hash,
+            payload
+          )
         VALUES
-          (gen_random_uuid(), $1, 'submitted', $2, $3)
+          (
+            gen_random_uuid(),
+            $1,
+            'submitted',
+            $2,
+            $3
+          )
       `,
-      [paymentResult.rows[0].id, txHash, JSON.stringify({ payerAddress })]
+      [
+        paymentResult.rows[0].id,
+        txHash,
+        JSON.stringify({ payerAddress })
+      ]
     );
 
-    res.json({ ok: true, paymentId: paymentResult.rows[0].id });
+    res.json({
+      ok: true,
+      paymentId: paymentResult.rows[0].id
+    });
   } catch (error) {
-    res.status(400).json({ ok: false, error: error.message });
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
   }
 });
 
@@ -117,7 +169,9 @@ router.post("/:token/verify", async (req, res) => {
   try {
     const invoiceResult = await query(
       `
-        SELECT i.id, i.status
+        SELECT
+          i.id,
+          i.status
         FROM invoices i
         WHERE i.checkout_token = $1
         LIMIT 1
@@ -126,18 +180,29 @@ router.post("/:token/verify", async (req, res) => {
     );
 
     if (invoiceResult.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: "Checkout not found" });
+      return res.status(404).json({
+        ok: false,
+        error: "Checkout not found"
+      });
     }
 
     const invoice = invoiceResult.rows[0];
 
     if (invoice.status === "paid") {
-      return res.json({ ok: true, status: "paid" });
+      return res.json({
+        ok: true,
+        status: "paid"
+      });
     }
 
     const paymentResult = await query(
       `
-        SELECT id, tx_hash, status
+        SELECT
+          id,
+          tx_hash,
+          status,
+          amount,
+          currency
         FROM payments
         WHERE invoice_id = $1
         ORDER BY created_at DESC
@@ -147,63 +212,150 @@ router.post("/:token/verify", async (req, res) => {
     );
 
     if (paymentResult.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: "No payment found for this invoice" });
+      return res.status(404).json({
+        ok: false,
+        error: "No payment found for this invoice"
+      });
     }
 
     const payment = paymentResult.rows[0];
 
     if (payment.status === "confirmed") {
-      return res.json({ ok: true, status: "confirmed" });
+      return res.json({
+        ok: true,
+        status: "confirmed"
+      });
     }
 
-    const rpcResponse = await fetch("https://rpc.testnet.arc.network", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "eth_getTransactionReceipt",
-        params: [payment.tx_hash]
-      })
-    });
+    const rpcResponse = await fetch(
+      "https://rpc.testnet.arc.network",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "eth_getTransactionReceipt",
+          params: [payment.tx_hash]
+        })
+      }
+    );
 
     const rpcData = await rpcResponse.json();
     const receipt = rpcData.result;
 
     if (!receipt) {
-      return res.json({ ok: true, status: "pending", message: "Not yet mined" });
+      return res.json({
+        ok: true,
+        status: "pending",
+        message: "Not yet mined"
+      });
     }
 
     const success = receipt.status === "0x1";
 
     if (!success) {
-      await query(`UPDATE payments SET status = 'failed' WHERE id = $1`, [payment.id]);
-      return res.json({ ok: true, status: "failed" });
+      await query(
+        `UPDATE payments SET status = 'failed' WHERE id = $1`,
+        [payment.id]
+      );
+
+      return res.json({
+        ok: true,
+        status: "failed"
+      });
     }
 
     const blockNumber = parseInt(receipt.blockNumber, 16);
 
     await query(
-      `UPDATE payments SET status = 'confirmed', block_number = $1, confirmed_at = NOW() WHERE id = $2`,
+      `
+        UPDATE payments
+        SET
+          status = 'confirmed',
+          block_number = $1,
+          confirmed_at = NOW()
+        WHERE id = $2
+      `,
       [blockNumber, payment.id]
     );
 
     await query(
-      `UPDATE invoices SET status = 'paid', paid_at = NOW() WHERE id = $1`,
+      `
+        UPDATE invoices
+        SET
+          status = 'paid',
+          paid_at = NOW()
+        WHERE id = $1
+      `,
       [invoice.id]
     );
 
     await query(
       `
-        INSERT INTO payment_events (id, payment_id, event_name, tx_hash, block_number, payload)
-        VALUES (gen_random_uuid(), $1, 'confirmed', $2, $3, $4)
+        INSERT INTO notifications
+          (
+            id,
+            merchant_id,
+            type,
+            title,
+            body
+          )
+        SELECT
+          gen_random_uuid(),
+          i.merchant_id,
+          'payment_confirmed',
+          'Payment received',
+          $2
+        FROM invoices i
+        WHERE i.id = $1
       `,
-      [payment.id, payment.tx_hash, blockNumber, JSON.stringify(receipt)]
+      [
+        invoice.id,
+        `Payment of ${payment.amount} ${payment.currency} has been confirmed.`
+      ]
     );
 
-    res.json({ ok: true, status: "confirmed" });
+    await query(
+      `
+        INSERT INTO payment_events
+          (
+            id,
+            payment_id,
+            event_name,
+            tx_hash,
+            block_number,
+            payload
+          )
+        VALUES
+          (
+            gen_random_uuid(),
+            $1,
+            'confirmed',
+            $2,
+            $3,
+            $4
+          )
+      `,
+      [
+        payment.id,
+        payment.tx_hash,
+        blockNumber,
+        JSON.stringify(receipt)
+      ]
+    );
+
+    res.json({
+      ok: true,
+      status: "confirmed"
+    });
   } catch (error) {
-    res.status(400).json({ ok: false, error: error.message });
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
   }
 });
 
