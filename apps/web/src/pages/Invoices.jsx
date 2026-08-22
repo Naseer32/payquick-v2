@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../services/api.js";
 
 export default function Invoices({ merchant }) {
+  const loadInvoicesRequestId = useRef(0);
   const [invoices, setInvoices] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [customerId, setCustomerId] = useState("");
