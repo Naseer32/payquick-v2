@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { apiRequest } from "../services/api.js";
 
 export default function Invoices({ merchant }) {
@@ -13,14 +14,18 @@ export default function Invoices({ merchant }) {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [copiedInvoiceId, setCopiedInvoiceId] = useState(null);
+  const [qrInvoiceId, setQrInvoiceId] = useState(null);
 
   async function loadInvoices() {
     const requestId = ++loadInvoicesRequestId.current;
+
     setLoading(true);
     setError("");
 
     try {
       const result = await apiRequest("/api/invoices");
+
       if (requestId === loadInvoicesRequestId.current) {
         setInvoices(result.invoices || []);
       }
@@ -54,7 +59,6 @@ export default function Invoices({ merchant }) {
     loadInvoices();
     loadCustomers();
   }, [merchant]);
-  
 
   async function handleCreateInvoice(event) {
     event.preventDefault();
@@ -85,6 +89,31 @@ export default function Invoices({ merchant }) {
     } finally {
       setCreating(false);
     }
+  }
+
+  async function copyCheckoutLink(invoice) {
+    const checkoutUrl =
+      `${window.location.origin}/pay/` +
+      encodeURIComponent(invoice.checkout_token);
+
+    try {
+      await navigator.clipboard.writeText(checkoutUrl);
+
+      setCopiedInvoiceId(invoice.id);
+
+      setTimeout(() => {
+        setCopiedInvoiceId(null);
+      }, 2000);
+    } catch (err) {
+      setError("Unable to copy checkout link.");
+    }
+  }
+
+  function getCheckoutUrl(invoice) {
+    return (
+      `${window.location.origin}/pay/` +
+      encodeURIComponent(invoice.checkout_token)
+    );
   }
 
   if (!merchant) {
@@ -119,7 +148,9 @@ export default function Invoices({ merchant }) {
                   key={customer.id}
                   value={customer.id}
                 >
-                  {customer.name || customer.email || "Unnamed customer"}
+                  {customer.name ||
+                    customer.email ||
+                    "Unnamed customer"}
                 </option>
               ))}
             </select>
@@ -193,7 +224,11 @@ export default function Invoices({ merchant }) {
 
       <h3>
         Payment Invoices{" "}
-        <button type="button" onClick={loadInvoices} disabled={loading}>
+        <button
+          type="button"
+          onClick={loadInvoices}
+          disabled={loading}
+        >
           Refresh
         </button>
       </h3>
@@ -206,49 +241,95 @@ export default function Invoices({ merchant }) {
 
       {!loading && invoices.length > 0 && (
         <div>
-          {invoices.map((invoice) => (
-            <article key={invoice.id}>
-              <h4>{invoice.invoice_number}</h4>
+          {invoices.map((invoice) => {
+            const checkoutUrl = getCheckoutUrl(invoice);
+            const showQr = qrInvoiceId === invoice.id;
 
-              <p>
-  {Number(invoice.amount)} {invoice.currency}
-</p>
+            return (
+              <article key={invoice.id}>
+                <h4>{invoice.invoice_number}</h4>
 
-              <p>Status: {invoice.status}</p>
+                <p>
+                  {Number(invoice.amount)} {invoice.currency}
+                </p>
 
-              {invoice.customer_id ? (
+                <p>Status: {invoice.status}</p>
+
+                {invoice.customer_id ? (
+                  <div>
+                    <p>
+                      Customer:{" "}
+                      {invoice.customer_name ||
+                        "Unnamed customer"}
+                    </p>
+
+                    {invoice.customer_email && (
+                      <p>
+                        Email: {invoice.customer_email}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p>Customer: None</p>
+                )}
+
+                {invoice.description && (
+                  <p>{invoice.description}</p>
+                )}
+
+                <p>
+                  Checkout:{" "}
+                  <a
+                    href={checkoutUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open checkout
+                  </a>
+                </p>
+
                 <div>
-                  <p>
-                    Customer:{" "}
-                    {invoice.customer_name || "Unnamed customer"}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyCheckoutLink(invoice)
+                    }
+                  >
+                    {copiedInvoiceId === invoice.id
+                      ? "Copied!"
+                      : "Copy link"}
+                  </button>
 
-                  {invoice.customer_email && (
-                    <p>Email: {invoice.customer_email}</p>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQrInvoiceId(
+                        showQr ? null : invoice.id
+                      )
+                    }
+                  >
+                    {showQr ? "Hide QR Code" : "Show QR Code"}
+                  </button>
                 </div>
-              ) : (
-                <p>Customer: None</p>
-              )}
 
-              {invoice.description && (
-                <p>{invoice.description}</p>
-              )}
+                {showQr && (
+                  <div>
+                    <p>Scan to pay</p>
 
-              <p>
-                Checkout:{" "}
-                <a
-                  href={`/pay/${encodeURIComponent(invoice.checkout_token)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open checkout
-                </a>
-              </p>
-            </article>
-          ))}
+                    <QRCodeSVG
+                      value={checkoutUrl}
+                      size={220}
+                      level="M"
+                    />
+
+                    <p>{checkoutUrl}</p>
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </div>
       )}
     </section>
   );
-}
+      }
