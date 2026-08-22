@@ -182,7 +182,12 @@ export default function Invoices({ merchant }) {
 
       {error && <p role="alert">{error}</p>}
 
-      <h3>Payment Invoices</h3>
+      <h3>
+        Payment Invoices{" "}
+        <button type="button" onClick={loadInvoices} disabled={loading}>
+          Refresh
+        </button>
+      </h3>
 
       {loading && <p>Loading invoices...</p>}
 
