@@ -5,9 +5,8 @@ const ARC_TESTNET_CHAIN_ID = "0x4cef52"; // 5042002
 const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
 const USDC_DECIMALS = 6;
 
-// Minimal ERC-20 transfer function selector + ABI encoding, no ethers.js needed
 function encodeTransfer(toAddress, amount) {
-  const methodId = "a9059cbb"; // transfer(address,uint256)
+  const methodId = "a9059cbb";
   const cleanTo = toAddress.replace("0x", "").toLowerCase().padStart(64, "0");
   const amountHex = BigInt(amount).toString(16).padStart(64, "0");
   return "0x" + methodId + cleanTo + amountHex;
@@ -20,6 +19,8 @@ export default function Checkout({ checkoutToken }) {
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState("");
   const [paySuccess, setPaySuccess] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [verifyStatus, setVerifyStatus] = useState("");
 
   useEffect(() => {
     if (!checkoutToken) {
@@ -53,13 +54,11 @@ export default function Checkout({ checkoutToken }) {
         throw new Error("No wallet found. Please open this page in Rabby or another Web3 browser.");
       }
 
-      // 1. Request account access
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts"
       });
       const payerAddress = accounts[0];
 
-      // 2. Confirm/switch to Arc Testnet
       const currentChainId = await window.ethereum.request({
         method: "eth_chainId"
       });
@@ -71,8 +70,7 @@ export default function Checkout({ checkoutToken }) {
         });
       }
 
-      // 3. Build USDC transfer
-      const merchantAddress = checkout.wallet_address || checkout.merchant_wallet_address;
+      const merchantAddress = checkout.wallet_address;
       if (!merchantAddress) {
         throw new Error("Merchant wallet address missing from checkout data.");
       }
@@ -82,7 +80,6 @@ export default function Checkout({ checkoutToken }) {
       );
       const data = encodeTransfer(merchantAddress, amountInBaseUnits);
 
-      // 4. Send transaction
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
         params: [
@@ -94,7 +91,6 @@ export default function Checkout({ checkoutToken }) {
         ]
       });
 
-      // 5. Notify backend
       await apiRequest(`/api/checkout/${encodeURIComponent(checkoutToken)}/pay`, {
         method: "POST",
         body: JSON.stringify({ txHash, payerAddress })
@@ -105,6 +101,24 @@ export default function Checkout({ checkoutToken }) {
       setPayError(err.message || "Payment failed.");
     } finally {
       setPaying(false);
+    }
+  }
+
+  async function handleVerify() {
+    setChecking(true);
+    setVerifyStatus("");
+    try {
+      const result = await apiRequest(`/api/checkout/${encodeURIComponent(checkoutToken)}/verify`, {
+        method: "POST"
+      });
+      setVerifyStatus(result.status);
+      if (result.status === "confirmed" || result.status === "paid") {
+        setCheckout((prev) => ({ ...prev, status: "paid" }));
+      }
+    } catch (err) {
+      setVerifyStatus("error: " + (err.message || "unknown"));
+    } finally {
+      setChecking(false);
     }
   }
 
@@ -147,8 +161,17 @@ export default function Checkout({ checkoutToken }) {
         </button>
       )}
 
-      {paySuccess && <p>Payment submitted! It will confirm shortly.</p>}
+      {paySuccess && (
+        <>
+          <p>Payment submitted! It will confirm shortly.</p>
+          <button type="button" onClick={handleVerify} disabled={checking}>
+            {checking ? "Checking..." : "Check Payment Status"}
+          </button>
+          {verifyStatus && <p>Status: {verifyStatus}</p>}
+        </>
+      )}
+
       {payError && <p style={{ color: "red" }}>{payError}</p>}
     </section>
   );
-}
+        }
