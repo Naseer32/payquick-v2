@@ -29,6 +29,16 @@ export default function Payments({ merchant }) {
     loadPayments();
   }, [merchant]);
 
+  useEffect(() => {
+    if (!merchant) return;
+
+    const interval = setInterval(() => {
+      loadPayments();
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [merchant]);
+
   if (!merchant) {
     return (
       <section>
