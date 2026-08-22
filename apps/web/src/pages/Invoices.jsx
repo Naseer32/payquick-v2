@@ -46,6 +46,16 @@ export default function Invoices({ merchant }) {
     loadInvoices();
     loadCustomers();
   }, [merchant]);
+  
+  useEffect(() => {
+    if (!merchant) return;
+
+    const interval = setInterval(() => {
+      loadInvoices();
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [merchant]);
 
   async function handleCreateInvoice(event) {
     event.preventDefault();
