@@ -44,6 +44,17 @@ export default function Checkout({ checkoutToken }) {
 
     loadCheckout();
   }, [checkoutToken]);
+  
+  useEffect(() => {
+    if (!paySuccess) return;
+    if (checkout?.status === "paid") return;
+
+    const interval = setInterval(() => {
+      handleVerify();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [paySuccess, checkout?.status]);
 
   async function handlePay() {
     setPayError("");
