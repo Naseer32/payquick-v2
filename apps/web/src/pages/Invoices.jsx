@@ -14,16 +14,23 @@ export default function Invoices({ merchant }) {
   const [error, setError] = useState("");
 
   async function loadInvoices() {
+    const requestId = ++loadInvoicesRequestId.current;
     setLoading(true);
     setError("");
 
     try {
       const result = await apiRequest("/api/invoices");
-      setInvoices(result.invoices || []);
+      if (requestId === loadInvoicesRequestId.current) {
+        setInvoices(result.invoices || []);
+      }
     } catch (err) {
-      setError(err.message || "Unable to load invoices.");
+      if (requestId === loadInvoicesRequestId.current) {
+        setError(err.message || "Unable to load invoices.");
+      }
     } finally {
-      setLoading(false);
+      if (requestId === loadInvoicesRequestId.current) {
+        setLoading(false);
+      }
     }
   }
 
