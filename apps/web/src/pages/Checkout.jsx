@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ethers } from "ethers";
 import { apiRequest } from "../services/api.js";
 
 const ARC_TESTNET_CHAIN_ID = "0x4cef52";
