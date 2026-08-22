@@ -73,7 +73,19 @@ export default function Payments({ merchant }) {
 
               <p>Status: {payment.status}</p>
 
-              <p>From: {payment.payer_address}</p>
+{payment.customer_name ? (
+  <div>
+    <p>Customer: {payment.customer_name}</p>
+
+    {payment.customer_email && (
+      <p>Email: {payment.customer_email}</p>
+    )}
+  </div>
+) : (
+  <p>Customer: None</p>
+)}
+
+<p>From: {payment.payer_address}</p>
 
               <p>
   Tx:{" "}
