@@ -85,20 +85,29 @@ export default function Checkout({ checkoutToken }) {
       }
 
       const amountInBaseUnits = BigInt(
-        Math.round(Number(checkout.amount) * 10 ** USDC_DECIMALS)
-      );
-      const data = encodeTransfer(merchantAddress, amountInBaseUnits);
+  Math.round(Number(checkout.amount) * 10 ** 18)
+);
 
-      const txHash = await window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [
-          {
-            from: payerAddress,
-            to: USDC_ADDRESS,
-            data
-          }
-        ]
-      });
+const memo = `${checkout.description || "Payment"} [${checkout.invoice_number}]`;
+
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+
+const contract = new ethers.Contract(
+  PAYMENT_TRACKER_ADDRESS,
+  PAYMENT_TRACKER_ABI,
+  signer
+);
+
+const tx = await contract.sendPayment(
+  merchantAddress,
+  memo,
+  { value: amountInBaseUnits.toString() }
+);
+
+const receipt = await tx.wait();
+
+const txHash = receipt.transactionHash;
 
       await apiRequest(`/api/checkout/${encodeURIComponent(checkoutToken)}/pay`, {
         method: "POST",
