@@ -60,6 +60,28 @@ export default function Invoices({ merchant }) {
     loadCustomers();
   }, [merchant]);
 
+  useEffect(() => {
+  if (!merchant) return;
+
+  function handleVisibilityChange() {
+    if (document.visibilityState === "visible") {
+      loadInvoices();
+    }
+  }
+
+  document.addEventListener(
+    "visibilitychange",
+    handleVisibilityChange
+  );
+
+  return () => {
+    document.removeEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+  };
+}, [merchant]);
+
   async function handleCreateInvoice(event) {
     event.preventDefault();
 
