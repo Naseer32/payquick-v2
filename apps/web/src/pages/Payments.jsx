@@ -68,8 +68,8 @@ export default function Payments({ merchant }) {
               <h4>{payment.invoice_number}</h4>
 
               <p>
-                {payment.amount} {payment.currency}
-              </p>
+  {Number(payment.amount)} {payment.currency}
+</p>
 
               <p>Status: {payment.status}</p>
 
