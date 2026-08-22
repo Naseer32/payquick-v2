@@ -21,12 +21,16 @@ router.get("/", requireAuth, async (req, res) => {
           p.confirmed_at,
           p.created_at,
           i.invoice_number,
-          i.description
+          i.description,
+          c.name AS customer_name,
+c.email AS customer_email
         FROM payments p
-        JOIN invoices i
-          ON i.id = p.invoice_id
-        JOIN merchants m
-          ON m.id = i.merchant_id
+JOIN invoices i
+  ON i.id = p.invoice_id
+JOIN merchants m
+  ON m.id = i.merchant_id
+LEFT JOIN customers c
+  ON c.id = i.customer_id
         WHERE m.wallet_address = $1
         ORDER BY p.created_at DESC
       `,
