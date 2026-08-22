@@ -113,4 +113,98 @@ router.post("/:token/pay", async (req, res) => {
   }
 });
 
+router.post("/:token/verify", async (req, res) => {
+  try {
+    const invoiceResult = await query(
+      `
+        SELECT i.id, i.status
+        FROM invoices i
+        WHERE i.checkout_token = $1
+        LIMIT 1
+      `,
+      [req.params.token]
+    );
+
+    if (invoiceResult.rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "Checkout not found" });
+    }
+
+    const invoice = invoiceResult.rows[0];
+
+    if (invoice.status === "paid") {
+      return res.json({ ok: true, status: "paid" });
+    }
+
+    const paymentResult = await query(
+      `
+        SELECT id, tx_hash, status
+        FROM payments
+        WHERE invoice_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1
+      `,
+      [invoice.id]
+    );
+
+    if (paymentResult.rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "No payment found for this invoice" });
+    }
+
+    const payment = paymentResult.rows[0];
+
+    if (payment.status === "confirmed") {
+      return res.json({ ok: true, status: "confirmed" });
+    }
+
+    const rpcResponse = await fetch("https://rpc.testnet.arc.network", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "eth_getTransactionReceipt",
+        params: [payment.tx_hash]
+      })
+    });
+
+    const rpcData = await rpcResponse.json();
+    const receipt = rpcData.result;
+
+    if (!receipt) {
+      return res.json({ ok: true, status: "pending", message: "Not yet mined" });
+    }
+
+    const success = receipt.status === "0x1";
+
+    if (!success) {
+      await query(`UPDATE payments SET status = 'failed' WHERE id = $1`, [payment.id]);
+      return res.json({ ok: true, status: "failed" });
+    }
+
+    const blockNumber = parseInt(receipt.blockNumber, 16);
+
+    await query(
+      `UPDATE payments SET status = 'confirmed', block_number = $1, confirmed_at = NOW() WHERE id = $2`,
+      [blockNumber, payment.id]
+    );
+
+    await query(
+      `UPDATE invoices SET status = 'paid', paid_at = NOW() WHERE id = $1`,
+      [invoice.id]
+    );
+
+    await query(
+      `
+        INSERT INTO payment_events (id, payment_id, event_name, tx_hash, block_number, payload)
+        VALUES (gen_random_uuid(), $1, 'confirmed', $2, $3, $4)
+      `,
+      [payment.id, payment.tx_hash, blockNumber, JSON.stringify(receipt)]
+    );
+
+    res.json({ ok: true, status: "confirmed" });
+  } catch (error) {
+    res.status(400).json({ ok: false, error: error.message });
+  }
+});
+
 export default router;
