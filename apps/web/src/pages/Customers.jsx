@@ -8,6 +8,8 @@ export default function Customers({ merchant }) {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [historyByCustomer, setHistoryByCustomer] = useState({});
+  const [loadingHistoryId, setLoadingHistoryId] = useState(null);
 
   async function loadCustomers() {
     setLoading(true);
