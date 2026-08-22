@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "../services/api.js";
 
 export default function Customers({ merchant }) {
+  const loadCustomersRequestId = useRef(0);
+  const historyRequestIds = useRef({});
   const [customers, setCustomers] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,16 +14,23 @@ export default function Customers({ merchant }) {
   const [loadingHistoryId, setLoadingHistoryId] = useState(null);
 
   async function loadCustomers() {
+    const requestId = ++loadCustomersRequestId.current;
     setLoading(true);
     setError("");
 
     try {
       const result = await apiRequest("/api/customers");
-      setCustomers(result.customers || []);
+      if (requestId === loadCustomersRequestId.current) {
+        setCustomers(result.customers || []);
+      }
     } catch (err) {
-      setError(err.message || "Unable to load customers.");
+      if (requestId === loadCustomersRequestId.current) {
+        setError(err.message || "Unable to load customers.");
+      }
     } finally {
-      setLoading(false);
+      if (requestId === loadCustomersRequestId.current) {
+        setLoading(false);
+      }
     }
   }
 
@@ -35,18 +44,27 @@ export default function Customers({ merchant }) {
   }, [merchant]);
 
   async function handleViewHistory(customerId) {
+    const requestId = (historyRequestIds.current[customerId] || 0) + 1;
+    historyRequestIds.current[customerId] = requestId;
+
     setLoadingHistoryId(customerId);
 
     try {
       const result = await apiRequest(`/api/customers/${customerId}/payments`);
-      setHistoryByCustomer((prev) => ({
-        ...prev,
-        [customerId]: result.history || []
-      }));
+      if (historyRequestIds.current[customerId] === requestId) {
+        setHistoryByCustomer((prev) => ({
+          ...prev,
+          [customerId]: result.history || []
+        }));
+      }
     } catch (err) {
-      setError(err.message || "Unable to load customer history.");
+      if (historyRequestIds.current[customerId] === requestId) {
+        setError(err.message || "Unable to load customer history.");
+      }
     } finally {
-      setLoadingHistoryId(null);
+      if (historyRequestIds.current[customerId] === requestId) {
+        setLoadingHistoryId(null);
+      }
     }
   }
 
