@@ -72,3 +72,16 @@ CREATE TABLE audit_logs (
   metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE sessions (
+  token TEXT PRIMARY KEY,
+  wallet_address TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX sessions_wallet_address_idx
+  ON sessions(wallet_address);
+
+CREATE INDEX sessions_expires_at_idx
+  ON sessions(expires_at);
