@@ -4,6 +4,7 @@ import { apiRequest } from "../services/api.js";
 
 export default function Invoices({ merchant }) {
   const loadInvoicesRequestId = useRef(0);
+
   const [invoices, setInvoices] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [customerId, setCustomerId] = useState("");
@@ -11,6 +12,7 @@ export default function Invoices({ merchant }) {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("USDC");
   const [description, setDescription] = useState("");
+  const [dueAt, setDueAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
@@ -61,26 +63,26 @@ export default function Invoices({ merchant }) {
   }, [merchant]);
 
   useEffect(() => {
-  if (!merchant) return;
+    if (!merchant) return;
 
-  function handleVisibilityChange() {
-    if (document.visibilityState === "visible") {
-      loadInvoices();
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        loadInvoices();
+      }
     }
-  }
 
-  document.addEventListener(
-    "visibilitychange",
-    handleVisibilityChange
-  );
-
-  return () => {
-    document.removeEventListener(
+    document.addEventListener(
       "visibilitychange",
       handleVisibilityChange
     );
-  };
-}, [merchant]);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+    };
+  }, [merchant]);
 
   async function handleCreateInvoice(event) {
     event.preventDefault();
@@ -96,7 +98,8 @@ export default function Invoices({ merchant }) {
           invoiceNumber,
           amount,
           currency,
-          description
+          description,
+          dueAt: dueAt || null
         })
       });
 
@@ -104,6 +107,7 @@ export default function Invoices({ merchant }) {
       setInvoiceNumber("");
       setAmount("");
       setDescription("");
+      setDueAt("");
 
       await loadInvoices();
     } catch (err) {
@@ -114,9 +118,7 @@ export default function Invoices({ merchant }) {
   }
 
   async function copyCheckoutLink(invoice) {
-    const checkoutUrl =
-      `${window.location.origin}/pay/` +
-      encodeURIComponent(invoice.checkout_token);
+    const checkoutUrl = getCheckoutUrl(invoice);
 
     try {
       await navigator.clipboard.writeText(checkoutUrl);
@@ -226,6 +228,19 @@ export default function Invoices({ merchant }) {
 
         <div>
           <label>
+            Due Date
+            <input
+              type="datetime-local"
+              value={dueAt}
+              onChange={(event) =>
+                setDueAt(event.target.value)
+              }
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
             Description
             <textarea
               value={description}
@@ -276,6 +291,15 @@ export default function Invoices({ merchant }) {
                 </p>
 
                 <p>Status: {invoice.status}</p>
+
+                {invoice.due_at && (
+                  <p>
+                    Due:{" "}
+                    {new Date(
+                      invoice.due_at
+                    ).toLocaleString()}
+                  </p>
+                )}
 
                 {invoice.customer_id ? (
                   <div>
@@ -330,7 +354,9 @@ export default function Invoices({ merchant }) {
                       )
                     }
                   >
-                    {showQr ? "Hide QR Code" : "Show QR Code"}
+                    {showQr
+                      ? "Hide QR Code"
+                      : "Show QR Code"}
                   </button>
                 </div>
 
@@ -354,4 +380,4 @@ export default function Invoices({ merchant }) {
       )}
     </section>
   );
-      }
+          }
