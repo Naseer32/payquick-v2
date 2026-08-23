@@ -84,6 +84,20 @@ export default function Invoices({ merchant }) {
     };
   }, [merchant]);
 
+  function convertLocalDateTimeToUTC(value) {
+    if (!value) {
+      return null;
+    }
+
+    const localDate = new Date(value);
+
+    if (Number.isNaN(localDate.getTime())) {
+      throw new Error("Invalid due date.");
+    }
+
+    return localDate.toISOString();
+  }
+
   async function handleCreateInvoice(event) {
     event.preventDefault();
 
@@ -91,6 +105,8 @@ export default function Invoices({ merchant }) {
     setError("");
 
     try {
+      const utcDueAt = convertLocalDateTimeToUTC(dueAt);
+
       await apiRequest("/api/invoices", {
         method: "POST",
         body: JSON.stringify({
@@ -99,7 +115,7 @@ export default function Invoices({ merchant }) {
           amount,
           currency,
           description,
-          dueAt: dueAt || null
+          dueAt: utcDueAt
         })
       });
 
@@ -237,6 +253,10 @@ export default function Invoices({ merchant }) {
               }
             />
           </label>
+
+          <small>
+            Due time uses your local time.
+          </small>
         </div>
 
         <div>
