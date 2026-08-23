@@ -66,7 +66,11 @@ export default function Dashboard({ merchant }) {
             Merchant wallet: {merchant.wallet_address}
           </p>
 
-          <h3>Notifications</h3>
+          <h3>
+  Notifications (
+  {notifications.filter((notification) => !notification.read_at).length}
+  )
+</h3>
 
           <button
             type="button"
