@@ -9,11 +9,13 @@ export default function Payments({ merchant }) {
 
   async function loadPayments() {
     const requestId = ++loadPaymentsRequestId.current;
+
     setLoading(true);
     setError("");
 
     try {
       const result = await apiRequest("/api/payments");
+
       if (requestId === loadPaymentsRequestId.current) {
         setPayments(result.payments || []);
       }
@@ -50,7 +52,11 @@ export default function Payments({ merchant }) {
     <section>
       <h2>
         Payments{" "}
-        <button type="button" onClick={loadPayments} disabled={loading}>
+        <button
+          type="button"
+          onClick={loadPayments}
+          disabled={loading}
+        >
           Refresh
         </button>
       </h2>
@@ -59,7 +65,9 @@ export default function Payments({ merchant }) {
 
       {loading && <p>Loading payments...</p>}
 
-      {!loading && payments.length === 0 && <p>No payments yet.</p>}
+      {!loading && payments.length === 0 && (
+        <p>No payments yet.</p>
+      )}
 
       {!loading && payments.length > 0 && (
         <div>
@@ -68,45 +76,76 @@ export default function Payments({ merchant }) {
               <h4>{payment.invoice_number}</h4>
 
               <p>
-  {Number(payment.amount)} {payment.currency}
-</p>
+                {Number(payment.amount)} {payment.currency}
+              </p>
 
               <p>Status: {payment.status}</p>
 
-{payment.customer_name ? (
-  <div>
-    <p>Customer: {payment.customer_name}</p>
+              {payment.customer_name ? (
+                <div>
+                  <p>
+                    Customer: {payment.customer_name}
+                  </p>
 
-    {payment.customer_email && (
-      <p>Email: {payment.customer_email}</p>
-    )}
-  </div>
-) : (
-  <p>Customer: None</p>
-)}
-
-<p>From: {payment.payer_address}</p>
-
-              <p>
-  Tx:{" "}
-  <a
-    href={`https://testnet.arcscan.app/tx/${payment.tx_hash}`}
-    target="_blank"
-    rel="noreferrer"
-  >
-    {payment.tx_hash}
-  </a>
-</p>
-
-              {payment.confirmed_at && (
-                <p>Confirmed: {new Date(payment.confirmed_at).toLocaleString()}</p>
+                  {payment.customer_email && (
+                    <p>
+                      Email: {payment.customer_email}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p>Customer: None</p>
               )}
 
-              {payment.description && <p>{payment.description}</p>}
+              <p>
+                From: {payment.payer_address}
+              </p>
+
+              <p>
+                To: {payment.receiver_address}
+              </p>
+
+              <p>
+                Tx:{" "}
+                <a
+                  href={`https://testnet.arcscan.app/tx/${payment.tx_hash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {payment.tx_hash}
+                </a>
+              </p>
+
+              {payment.block_number !== null &&
+                payment.block_number !== undefined && (
+                  <p>
+                    Block: {payment.block_number}
+                  </p>
+                )}
+
+              {payment.confirmed_at && (
+                <p>
+                  Confirmed:{" "}
+                  {new Date(
+                    payment.confirmed_at
+                  ).toLocaleString()}
+                </p>
+              )}
+
+              <p>
+                Created:{" "}
+                {new Date(
+                  payment.created_at
+                ).toLocaleString()}
+              </p>
+
+              {payment.description && (
+                <p>{payment.description}</p>
+              )}
             </article>
           ))}
         </div>
       )}
-        </section>
+    </section>
   );
 }
