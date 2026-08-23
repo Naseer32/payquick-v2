@@ -24,6 +24,29 @@ export default function Dashboard({ merchant }) {
     }
   }
 
+  async function markAsRead(notificationId) {
+    try {
+      await apiRequest(`/api/notifications/${notificationId}/read`, {
+        method: "POST"
+      });
+
+      setNotifications((current) =>
+        current.map((notification) =>
+          notification.id === notificationId
+            ? {
+                ...notification,
+                read_at: new Date().toISOString()
+              }
+            : notification
+        )
+      );
+    } catch (err) {
+      setNotificationError(
+        err.message || "Unable to mark notification as read."
+      );
+    }
+  }
+
   useEffect(() => {
     if (!merchant) {
       setNotifications([]);
@@ -79,8 +102,23 @@ export default function Dashboard({ merchant }) {
                       ).toLocaleString()}
                     </p>
 
-                    {!notification.read_at && (
-                      <strong>Unread</strong>
+                    {notification.read_at ? (
+                      <p>Read</p>
+                    ) : (
+                      <>
+                        <strong>Unread</strong>
+
+                        <br />
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            markAsRead(notification.id)
+                          }
+                        >
+                          Mark as read
+                        </button>
+                      </>
                     )}
                   </article>
                 ))}
