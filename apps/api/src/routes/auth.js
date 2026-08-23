@@ -1,5 +1,5 @@
-import { requireAuth } from "../middleware/authMiddleware.js";
 import { Router } from "express";
+import { requireAuth } from "../middleware/authMiddleware.js";
 import { getOrCreateMerchant } from "../services/merchantService.js";
 import {
   createChallenge,
@@ -16,10 +16,17 @@ router.get("/status", (_req, res) => {
   });
 });
 
-router.post("/challenge", (req, res) => {
+router.post("/challenge", async (req, res) => {
   try {
     const { walletAddress } = req.body;
     const normalizedAddress = walletAddress?.toLowerCase();
+
+    if (!normalizedAddress) {
+      return res.status(400).json({
+        ok: false,
+        error: "Wallet address is required"
+      });
+    }
 
     const nonce = createChallenge(normalizedAddress);
 
@@ -33,7 +40,9 @@ router.post("/challenge", (req, res) => {
 
     res.status(400).json({
       ok: false,
-      error: error?.message || "Failed to create authentication challenge"
+      error:
+        error?.message ||
+        "Failed to create authentication challenge"
     });
   }
 });
@@ -50,7 +59,10 @@ router.post("/merchant", requireAuth, async (req, res) => {
       created: result.created
     });
   } catch (error) {
-    console.error("PayQuick merchant authentication error:", error);
+    console.error(
+      "PayQuick merchant authentication error:",
+      error
+    );
 
     res.status(500).json({
       ok: false,
@@ -68,14 +80,29 @@ router.post("/merchant", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/verify", (req, res) => {
+router.post("/verify", async (req, res) => {
   try {
     const { walletAddress, signature } = req.body;
     const normalizedAddress = walletAddress?.toLowerCase();
 
+    if (!normalizedAddress || !signature) {
+      return res.status(400).json({
+        ok: false,
+        error: "Wallet address and signature are required"
+      });
+    }
+
     const challenge = consumeChallenge(normalizedAddress);
 
-    const message = `Sign in to PayQuick\n\nNonce: ${challenge.nonce}`;
+    if (!challenge) {
+      return res.status(400).json({
+        ok: false,
+        error: "Authentication challenge expired or not found"
+      });
+    }
+
+    const message =
+      `Sign in to PayQuick\n\nNonce: ${challenge.nonce}`;
 
     const valid = verifyWalletSignature(
       normalizedAddress,
@@ -90,7 +117,8 @@ router.post("/verify", (req, res) => {
       });
     }
 
-    const sessionToken = createSession(normalizedAddress);
+    const sessionToken =
+      await createSession(normalizedAddress);
 
     res.json({
       ok: true,
@@ -99,11 +127,16 @@ router.post("/verify", (req, res) => {
       sessionToken
     });
   } catch (error) {
-    console.error("PayQuick verification error:", error);
+    console.error(
+      "PayQuick verification error:",
+      error
+    );
 
     res.status(400).json({
       ok: false,
-      error: error?.message || "Wallet verification failed"
+      error:
+        error?.message ||
+        "Wallet verification failed"
     });
   }
 });
