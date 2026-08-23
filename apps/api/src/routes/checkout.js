@@ -322,7 +322,7 @@ router.post("/:token/verify", async (req, res) => {
   `,
   [
     invoice.id,
-    `Payment of ${payment.amount} ${payment.currency} has been confirmed.`
+    `Payment of ${Number(payment.amount)} ${payment.currency} has been confirmed.`
   ]
 );
 
