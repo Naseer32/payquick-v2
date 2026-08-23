@@ -1,14 +1,96 @@
+import { useEffect, useState } from "react";
+import { apiRequest } from "../services/api.js";
+
 export default function Dashboard({ merchant }) {
+  const [notifications, setNotifications] = useState([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const [notificationError, setNotificationError] = useState("");
+
+  async function loadNotifications() {
+    if (!merchant) return;
+
+    setLoadingNotifications(true);
+    setNotificationError("");
+
+    try {
+      const result = await apiRequest("/api/notifications");
+      setNotifications(result.notifications || []);
+    } catch (err) {
+      setNotificationError(
+        err.message || "Unable to load notifications."
+      );
+    } finally {
+      setLoadingNotifications(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!merchant) {
+      setNotifications([]);
+      return;
+    }
+
+    loadNotifications();
+  }, [merchant]);
+
   return (
     <section>
       <h2>Dashboard</h2>
 
       {merchant ? (
-        <p>
-          Merchant wallet: {merchant.wallet_address}
-        </p>
+        <>
+          <p>
+            Merchant wallet: {merchant.wallet_address}
+          </p>
+
+          <h3>Notifications</h3>
+
+          <button
+            type="button"
+            onClick={loadNotifications}
+            disabled={loadingNotifications}
+          >
+            {loadingNotifications ? "Loading..." : "Refresh"}
+          </button>
+
+          {notificationError && (
+            <p role="alert">{notificationError}</p>
+          )}
+
+          {!loadingNotifications &&
+            notifications.length === 0 && (
+              <p>No notifications yet.</p>
+            )}
+
+          {!loadingNotifications &&
+            notifications.length > 0 && (
+              <div>
+                {notifications.map((notification) => (
+                  <article key={notification.id}>
+                    <h4>{notification.title}</h4>
+
+                    {notification.body && (
+                      <p>{notification.body}</p>
+                    )}
+
+                    <p>
+                      {new Date(
+                        notification.created_at
+                      ).toLocaleString()}
+                    </p>
+
+                    {!notification.read_at && (
+                      <strong>Unread</strong>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
+        </>
       ) : (
-        <p>Connect your wallet to access your merchant dashboard.</p>
+        <p>
+          Connect your wallet to access your merchant dashboard.
+        </p>
       )}
     </section>
   );
