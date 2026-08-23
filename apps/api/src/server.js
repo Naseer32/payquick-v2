@@ -6,6 +6,7 @@ import invoicesRouter from "./routes/invoices.js";
 import checkoutRouter from "./routes/checkout.js";
 import customersRouter from "./routes/customers.js";
 import paymentsRouter from "./routes/payments.js";
+import notificationsRouter from "./routes/notifications.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -19,6 +20,7 @@ app.use("/api/invoices", invoicesRouter);
 app.use("/api/checkout", checkoutRouter);
 app.use("/api/customers", customersRouter);
 app.use("/api/payments", paymentsRouter);
+app.use("/api/notifications", notificationsRouter);
 
 app.listen(PORT, () => {
   console.log(`PayQuick API running on port ${PORT}`);
