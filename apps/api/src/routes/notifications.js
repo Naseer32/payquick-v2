@@ -36,4 +36,40 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
+router.post("/:id/read", requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `
+        UPDATE notifications n
+        SET read_at = NOW()
+        FROM merchants m
+        WHERE n.id = $1
+          AND n.merchant_id = m.id
+          AND m.wallet_address = $2
+        RETURNING
+          n.id,
+          n.read_at
+      `,
+      [req.params.id, req.auth.walletAddress]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Notification not found"
+      });
+    }
+
+    res.json({
+      ok: true,
+      notification: result.rows[0]
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
 export default router;
