@@ -35,9 +35,29 @@ router.get("/:token", async (req, res) => {
       });
     }
 
+    const checkout = result.rows[0];
+
+    if (
+      checkout.status === "pending" &&
+      checkout.due_at &&
+      new Date(checkout.due_at).getTime() <= Date.now()
+    ) {
+      await query(
+        `
+          UPDATE invoices
+          SET status = 'expired'
+          WHERE id = $1
+            AND status = 'pending'
+        `,
+        [checkout.id]
+      );
+
+      checkout.status = "expired";
+    }
+
     res.json({
       ok: true,
-      checkout: result.rows[0]
+      checkout
     });
   } catch (error) {
     res.status(400).json({
@@ -65,6 +85,7 @@ router.post("/:token/pay", async (req, res) => {
           i.amount,
           i.currency,
           i.status,
+          i.due_at,
           m.wallet_address
         FROM invoices i
         JOIN merchants m
@@ -84,10 +105,34 @@ router.post("/:token/pay", async (req, res) => {
 
     const invoice = invoiceResult.rows[0];
 
+    if (
+      invoice.status === "pending" &&
+      invoice.due_at &&
+      new Date(invoice.due_at).getTime() <= Date.now()
+    ) {
+      await query(
+        `
+          UPDATE invoices
+          SET status = 'expired'
+          WHERE id = $1
+            AND status = 'pending'
+        `,
+        [invoice.id]
+      );
+
+      return res.status(409).json({
+        ok: false,
+        error: "Invoice has expired"
+      });
+    }
+
     if (invoice.status !== "pending") {
       return res.status(409).json({
         ok: false,
-        error: "Invoice is not pending"
+        error:
+          invoice.status === "expired"
+            ? "Invoice has expired"
+            : "Invoice is not pending"
       });
     }
 
@@ -171,7 +216,8 @@ router.post("/:token/verify", async (req, res) => {
       `
         SELECT
           i.id,
-          i.status
+          i.status,
+          i.due_at
         FROM invoices i
         WHERE i.checkout_token = $1
         LIMIT 1
@@ -192,6 +238,34 @@ router.post("/:token/verify", async (req, res) => {
       return res.json({
         ok: true,
         status: "paid"
+      });
+    }
+
+    if (
+      invoice.status === "pending" &&
+      invoice.due_at &&
+      new Date(invoice.due_at).getTime() <= Date.now()
+    ) {
+      await query(
+        `
+          UPDATE invoices
+          SET status = 'expired'
+          WHERE id = $1
+            AND status = 'pending'
+        `,
+        [invoice.id]
+      );
+
+      return res.json({
+        ok: true,
+        status: "expired"
+      });
+    }
+
+    if (invoice.status === "expired") {
+      return res.json({
+        ok: true,
+        status: "expired"
       });
     }
 
@@ -294,37 +368,37 @@ router.post("/:token/verify", async (req, res) => {
     );
 
     await query(
-  `
-    INSERT INTO notifications
-      (
-        id,
-        merchant_id,
-        type,
-        title,
-        body
-      )
-    SELECT
-      gen_random_uuid(),
-      i.merchant_id,
-      'payment_confirmed',
-      'Payment received',
-      $2
-    FROM invoices i
-    WHERE i.id = $1
-      AND NOT EXISTS (
-        SELECT 1
-        FROM notifications n
-        WHERE n.merchant_id = i.merchant_id
-          AND n.type = 'payment_confirmed'
-          AND n.title = 'Payment received'
-          AND n.body = $2
-      )
-  `,
-  [
-    invoice.id,
-    `Payment of ${Number(payment.amount)} ${payment.currency} has been confirmed.`
-  ]
-);
+      `
+        INSERT INTO notifications
+          (
+            id,
+            merchant_id,
+            type,
+            title,
+            body
+          )
+        SELECT
+          gen_random_uuid(),
+          i.merchant_id,
+          'payment_confirmed',
+          'Payment received',
+          $2
+        FROM invoices i
+        WHERE i.id = $1
+          AND NOT EXISTS (
+            SELECT 1
+            FROM notifications n
+            WHERE n.merchant_id = i.merchant_id
+              AND n.type = 'payment_confirmed'
+              AND n.title = 'Payment received'
+              AND n.body = $2
+          )
+      `,
+      [
+        invoice.id,
+        `Payment of ${Number(payment.amount)} ${payment.currency} has been confirmed.`
+      ]
+    );
 
     await query(
       `
