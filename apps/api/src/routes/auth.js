@@ -28,7 +28,7 @@ router.post("/challenge", async (req, res) => {
       });
     }
 
-    const nonce = createChallenge(normalizedAddress);
+    const nonce = await createChallenge(normalizedAddress);
 
     res.json({
       ok: true,
@@ -92,7 +92,7 @@ router.post("/verify", async (req, res) => {
       });
     }
 
-    const challenge = consumeChallenge(normalizedAddress);
+    const challenge = await consumeChallenge(normalizedAddress);
 
     if (!challenge) {
       return res.status(400).json({
