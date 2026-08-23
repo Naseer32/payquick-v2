@@ -7,6 +7,18 @@ export default function Payments({ merchant }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  function shortenAddress(address) {
+    if (!address) return "Unknown";
+
+    return `${address.slice(0, 8)}...${address.slice(-6)}`;
+  }
+
+  function shortenTxHash(txHash) {
+    if (!txHash) return "Unknown";
+
+    return `${txHash.slice(0, 8)}...${txHash.slice(-6)}`;
+  }
+
   async function loadPayments() {
     const requestId = ++loadPaymentsRequestId.current;
 
@@ -98,11 +110,11 @@ export default function Payments({ merchant }) {
               )}
 
               <p>
-                From: {payment.payer_address}
+                From: {shortenAddress(payment.payer_address)}
               </p>
 
               <p>
-                To: {payment.receiver_address}
+                To: {shortenAddress(payment.receiver_address)}
               </p>
 
               <p>
@@ -111,8 +123,9 @@ export default function Payments({ merchant }) {
                   href={`https://testnet.arcscan.app/tx/${payment.tx_hash}`}
                   target="_blank"
                   rel="noreferrer"
+                  title={payment.tx_hash}
                 >
-                  {payment.tx_hash}
+                  {shortenTxHash(payment.tx_hash)}
                 </a>
               </p>
 
