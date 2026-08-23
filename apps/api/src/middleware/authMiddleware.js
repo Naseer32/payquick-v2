@@ -1,6 +1,6 @@
 import { getSession } from "../services/sessionService.js";
 
-export function requireAuth(req, res, next) {
+export async function requireAuth(req, res, next) {
   const authorization = req.headers.authorization;
 
   if (!authorization?.startsWith("Bearer ")) {
@@ -11,16 +11,26 @@ export function requireAuth(req, res, next) {
   }
 
   const token = authorization.slice(7);
-  const session = getSession(token);
 
-  if (!session) {
-    return res.status(401).json({
+  try {
+    const session = await getSession(token);
+
+    if (!session) {
+      return res.status(401).json({
+        ok: false,
+        error: "Invalid or expired session"
+      });
+    }
+
+    req.auth = session;
+
+    next();
+  } catch (error) {
+    console.error("Session validation error:", error);
+
+    return res.status(500).json({
       ok: false,
-      error: "Invalid or expired session"
+      error: "Unable to validate session"
     });
   }
-
-  req.auth = session;
-
-  next();
 }
