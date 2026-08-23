@@ -294,29 +294,37 @@ router.post("/:token/verify", async (req, res) => {
     );
 
     await query(
-      `
-        INSERT INTO notifications
-          (
-            id,
-            merchant_id,
-            type,
-            title,
-            body
-          )
-        SELECT
-          gen_random_uuid(),
-          i.merchant_id,
-          'payment_confirmed',
-          'Payment received',
-          $2
-        FROM invoices i
-        WHERE i.id = $1
-      `,
-      [
-        invoice.id,
-        `Payment of ${payment.amount} ${payment.currency} has been confirmed.`
-      ]
-    );
+  `
+    INSERT INTO notifications
+      (
+        id,
+        merchant_id,
+        type,
+        title,
+        body
+      )
+    SELECT
+      gen_random_uuid(),
+      i.merchant_id,
+      'payment_confirmed',
+      'Payment received',
+      $2
+    FROM invoices i
+    WHERE i.id = $1
+      AND NOT EXISTS (
+        SELECT 1
+        FROM notifications n
+        WHERE n.merchant_id = i.merchant_id
+          AND n.type = 'payment_confirmed'
+          AND n.title = 'Payment received'
+          AND n.body = $2
+      )
+  `,
+  [
+    invoice.id,
+    `Payment of ${payment.amount} ${payment.currency} has been confirmed.`
+  ]
+);
 
     await query(
       `
