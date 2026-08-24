@@ -7,6 +7,17 @@ export default function Dashboard({ merchant, darkMode }) {
   const [notificationError, setNotificationError] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const [stats, setStats] = useState({
+    payments: 0,
+    invoices: 0,
+    customers: 0,
+    totalReceived: 0,
+    currency: "USDC"
+  });
+
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [statsError, setStatsError] = useState("");
+
   async function loadNotifications() {
     if (!merchant) return;
 
@@ -51,14 +62,77 @@ export default function Dashboard({ merchant, darkMode }) {
     }
   }
 
+  async function loadStats() {
+    if (!merchant) return;
+
+    setLoadingStats(true);
+    setStatsError("");
+
+    try {
+      const [paymentsResult, invoicesResult, customersResult] =
+        await Promise.all([
+          apiRequest("/api/payments"),
+          apiRequest("/api/invoices"),
+          apiRequest("/api/customers")
+        ]);
+
+      const payments = paymentsResult.payments || [];
+      const invoices = invoicesResult.invoices || [];
+      const customers = customersResult.customers || [];
+
+      const successfulPayments = payments.filter(
+        (payment) =>
+          payment.status === "confirmed" ||
+          payment.status === "paid"
+      );
+
+      const totalReceived = successfulPayments.reduce(
+        (total, payment) =>
+          total + Number(payment.amount || 0),
+        0
+      );
+
+      const currency =
+        successfulPayments.find(
+          (payment) => payment.currency
+        )?.currency || "USDC";
+
+      setStats({
+        payments: payments.length,
+        invoices: invoices.length,
+        customers: customers.length,
+        totalReceived,
+        currency
+      });
+    } catch (err) {
+      console.error("PayQuick dashboard stats failed:", err);
+
+      setStatsError(
+        err.message || "Unable to load dashboard statistics."
+      );
+    } finally {
+      setLoadingStats(false);
+    }
+  }
+
   useEffect(() => {
     if (!merchant) {
       setNotifications([]);
       setShowNotifications(false);
+
+      setStats({
+        payments: 0,
+        invoices: 0,
+        customers: 0,
+        totalReceived: 0,
+        currency: "USDC"
+      });
+
       return;
     }
 
     loadNotifications();
+    loadStats();
   }, [merchant]);
 
   const theme = darkMode
@@ -326,6 +400,26 @@ export default function Dashboard({ merchant, darkMode }) {
               </div>
             </div>
 
+            {statsError && (
+              <div
+                style={{
+                  ...cardStyle,
+                  marginBottom: "20px",
+                  borderColor: "#ef4444"
+                }}
+              >
+                <p
+                  role="alert"
+                  style={{
+                    margin: 0,
+                    color: "#ef4444"
+                  }}
+                >
+                  {statsError}
+                </p>
+              </div>
+            )}
+
             <div
               style={{
                 display: "grid",
@@ -351,7 +445,7 @@ export default function Dashboard({ merchant, darkMode }) {
                     fontSize: "28px"
                   }}
                 >
-                  --
+                  {loadingStats ? "..." : stats.payments}
                 </strong>
 
                 <p
@@ -381,7 +475,7 @@ export default function Dashboard({ merchant, darkMode }) {
                     fontSize: "28px"
                   }}
                 >
-                  --
+                  {loadingStats ? "..." : stats.invoices}
                 </strong>
 
                 <p
@@ -411,7 +505,7 @@ export default function Dashboard({ merchant, darkMode }) {
                     fontSize: "28px"
                   }}
                 >
-                  --
+                  {loadingStats ? "..." : stats.customers}
                 </strong>
 
                 <p
@@ -422,6 +516,44 @@ export default function Dashboard({ merchant, darkMode }) {
                   }}
                 >
                   Customer records
+                </p>
+              </div>
+
+              <div style={cardStyle}>
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Total Received
+                </p>
+
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  {loadingStats
+                    ? "..."
+                    : `${stats.totalReceived.toLocaleString(
+                        undefined,
+                        {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 2
+                        }
+                      )} ${stats.currency}`}
+                </strong>
+
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Confirmed payments
                 </p>
               </div>
             </div>
@@ -572,35 +704,4 @@ export default function Dashboard({ merchant, darkMode }) {
                               <button
                                 type="button"
                                 onClick={() =>
-                                  markAsRead(
-                                    notification.id
-                                  )
-                                }
-                                style={{
-                                  marginTop: "10px",
-                                  border: "none",
-                                  background:
-                                    "transparent",
-                                  color:
-                                    theme.primary,
-                                  padding: 0,
-                                  cursor: "pointer",
-                                  fontWeight: "600"
-                                }}
-                              >
-                                Mark as read
-                              </button>
-                            )}
-                          </article>
-                        )
-                      )}
-                    </div>
-                  )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
+           
