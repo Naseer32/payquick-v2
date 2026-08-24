@@ -14,7 +14,8 @@ export default function Landing({ onGetStarted }) {
         background: "#f8fafc",
         color: "#0f172a",
         fontFamily:
-          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+        overflowX: "hidden"
       }}
     >
       {/* Navigation */}
@@ -23,7 +24,7 @@ export default function Landing({ onGetStarted }) {
           position: "sticky",
           top: 0,
           zIndex: 50,
-          background: "rgba(248,250,252,0.92)",
+          background: "rgba(248,250,252,0.94)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid #e2e8f0"
         }}
@@ -32,16 +33,21 @@ export default function Landing({ onGetStarted }) {
           style={{
             maxWidth: "1180px",
             margin: "0 auto",
-            padding: "16px 20px",
+            padding: "14px 20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "20px"
+            gap: "16px"
           }}
         >
           <button
             type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+              })
+            }
             style={{
               border: "none",
               background: "transparent",
@@ -49,7 +55,8 @@ export default function Landing({ onGetStarted }) {
               cursor: "pointer",
               fontSize: "21px",
               fontWeight: "800",
-              padding: 0
+              padding: 0,
+              flexShrink: 0
             }}
           >
             PayQuick
@@ -59,7 +66,10 @@ export default function Landing({ onGetStarted }) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "24px"
+              gap: "8px",
+              overflowX: "auto",
+              maxWidth: "100%",
+              paddingBottom: "2px"
             }}
           >
             <button
@@ -103,11 +113,11 @@ export default function Landing({ onGetStarted }) {
           style={{
             maxWidth: "1180px",
             margin: "0 auto",
-            padding: "90px 20px 80px",
+            padding: "clamp(55px, 8vw, 90px) 20px 70px",
             display: "grid",
             gridTemplateColumns:
-              "minmax(0, 1.1fr) minmax(320px, 0.9fr)",
-            gap: "60px",
+              "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+            gap: "45px",
             alignItems: "center"
           }}
         >
@@ -123,7 +133,7 @@ export default function Landing({ onGetStarted }) {
                 color: "#0369a1",
                 fontSize: "13px",
                 fontWeight: "700",
-                marginBottom: "22px"
+                marginBottom: "20px"
               }}
             >
               Built on Arc
@@ -133,9 +143,9 @@ export default function Landing({ onGetStarted }) {
               style={{
                 margin: 0,
                 maxWidth: "720px",
-                fontSize: "clamp(44px, 6vw, 76px)",
-                lineHeight: "0.98",
-                letterSpacing: "-3px"
+                fontSize: "clamp(42px, 7vw, 76px)",
+                lineHeight: "0.99",
+                letterSpacing: "clamp(-2px, -0.3vw, -3px)"
               }}
             >
               Stablecoin payments made simple.
@@ -144,9 +154,9 @@ export default function Landing({ onGetStarted }) {
             <p
               style={{
                 maxWidth: "650px",
-                margin: "28px 0 0",
+                margin: "25px 0 0",
                 color: "#64748b",
-                fontSize: "19px",
+                fontSize: "18px",
                 lineHeight: "1.7"
               }}
             >
@@ -160,7 +170,7 @@ export default function Landing({ onGetStarted }) {
                 display: "flex",
                 gap: "12px",
                 flexWrap: "wrap",
-                marginTop: "32px"
+                marginTop: "30px"
               }}
             >
               <button
@@ -190,7 +200,7 @@ export default function Landing({ onGetStarted }) {
 
             <p
               style={{
-                marginTop: "18px",
+                marginTop: "17px",
                 color: "#94a3b8",
                 fontSize: "13px"
               }}
@@ -202,18 +212,19 @@ export default function Landing({ onGetStarted }) {
           {/* Product preview */}
           <div
             style={{
+              width: "100%",
+              boxSizing: "border-box",
               background: "#0f172a",
               borderRadius: "24px",
-              padding: "18px",
-              boxShadow:
-                "0 30px 80px rgba(15,23,42,0.20)"
+              padding: "14px",
+              boxShadow: "0 25px 65px rgba(15,23,42,0.18)"
             }}
           >
             <div
               style={{
                 background: "#111827",
                 borderRadius: "17px",
-                padding: "22px",
+                padding: "clamp(18px, 4vw, 24px)",
                 color: "#f8fafc"
               }}
             >
@@ -222,7 +233,8 @@ export default function Landing({ onGetStarted }) {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  marginBottom: "30px"
+                  gap: "10px",
+                  marginBottom: "28px"
                 }}
               >
                 <strong style={{ fontSize: "18px" }}>
@@ -232,7 +244,8 @@ export default function Landing({ onGetStarted }) {
                 <span
                   style={{
                     fontSize: "12px",
-                    color: "#34d399"
+                    color: "#34d399",
+                    whiteSpace: "nowrap"
                   }}
                 >
                   ● Connected
@@ -253,7 +266,7 @@ export default function Landing({ onGetStarted }) {
                 style={{
                   display: "block",
                   marginTop: "6px",
-                  fontSize: "38px"
+                  fontSize: "clamp(32px, 7vw, 38px)"
                 }}
               >
                 50 USDC
@@ -263,30 +276,15 @@ export default function Landing({ onGetStarted }) {
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "repeat(2, 1fr)",
-                  gap: "12px",
-                  marginTop: "24px"
+                    "repeat(2, minmax(0, 1fr))",
+                  gap: "10px",
+                  marginTop: "22px"
                 }}
               >
-                <PreviewStat
-                  value="12"
-                  label="Payments"
-                />
-
-                <PreviewStat
-                  value="16"
-                  label="Invoices"
-                />
-
-                <PreviewStat
-                  value="1"
-                  label="Customers"
-                />
-
-                <PreviewStat
-                  value="100%"
-                  label="Confirmed"
-                />
+                <PreviewStat value="12" label="Payments" />
+                <PreviewStat value="16" label="Invoices" />
+                <PreviewStat value="1" label="Customers" />
+                <PreviewStat value="100%" label="Confirmed" />
               </div>
             </div>
           </div>
@@ -303,7 +301,7 @@ export default function Landing({ onGetStarted }) {
             style={{
               maxWidth: "1180px",
               margin: "0 auto",
-              padding: "80px 20px"
+              padding: "75px 20px"
             }}
           >
             <p style={sectionEyebrowStyle}>THE PROBLEM</p>
@@ -316,9 +314,9 @@ export default function Landing({ onGetStarted }) {
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "repeat(auto-fit, minmax(220px, 1fr))",
-                gap: "18px",
-                marginTop: "42px"
+                  "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
+                gap: "16px",
+                marginTop: "38px"
               }}
             >
               <DarkProblem
@@ -348,7 +346,7 @@ export default function Landing({ onGetStarted }) {
           style={{
             maxWidth: "1180px",
             margin: "0 auto",
-            padding: "90px 20px"
+            padding: "75px 20px"
           }}
         >
           <p style={sectionEyebrowStyle}>WHAT PAYQUICK DOES</p>
@@ -361,9 +359,9 @@ export default function Landing({ onGetStarted }) {
             style={{
               display: "grid",
               gridTemplateColumns:
-                "repeat(auto-fit, minmax(250px, 1fr))",
-              gap: "18px",
-              marginTop: "42px"
+                "repeat(auto-fit, minmax(min(100%, 250px), 1fr))",
+              gap: "16px",
+              marginTop: "38px"
             }}
           >
             <Feature
@@ -415,7 +413,7 @@ export default function Landing({ onGetStarted }) {
             style={{
               maxWidth: "1180px",
               margin: "0 auto",
-              padding: "90px 20px"
+              padding: "75px 20px"
             }}
           >
             <p style={sectionEyebrowStyle}>HOW IT WORKS</p>
@@ -428,9 +426,9 @@ export default function Landing({ onGetStarted }) {
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "20px",
-                marginTop: "42px"
+                  "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
+                gap: "16px",
+                marginTop: "38px"
               }}
             >
               <Step
@@ -460,7 +458,7 @@ export default function Landing({ onGetStarted }) {
           style={{
             maxWidth: "1180px",
             margin: "0 auto",
-            padding: "90px 20px"
+            padding: "75px 20px"
           }}
         >
           <p style={sectionEyebrowStyle}>WHY ARC</p>
@@ -473,9 +471,9 @@ export default function Landing({ onGetStarted }) {
             style={{
               display: "grid",
               gridTemplateColumns:
-                "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "18px",
-              marginTop: "42px"
+                "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
+              gap: "16px",
+              marginTop: "38px"
             }}
           >
             <Feature
@@ -509,7 +507,7 @@ export default function Landing({ onGetStarted }) {
           style={{
             maxWidth: "1180px",
             margin: "0 auto",
-            padding: "0 20px 90px"
+            padding: "0 20px 75px"
           }}
         >
           <div
@@ -517,14 +515,15 @@ export default function Landing({ onGetStarted }) {
               background: "#0f172a",
               color: "#f8fafc",
               borderRadius: "24px",
-              padding: "55px 30px",
+              padding: "clamp(40px, 7vw, 55px) 24px",
               textAlign: "center"
             }}
           >
             <h2
               style={{
                 margin: 0,
-                fontSize: "clamp(30px, 4vw, 46px)",
+                fontSize: "clamp(30px, 6vw, 46px)",
+                lineHeight: "1.08",
                 letterSpacing: "-1.5px"
               }}
             >
@@ -563,7 +562,7 @@ export default function Landing({ onGetStarted }) {
       <footer
         style={{
           borderTop: "1px solid #e2e8f0",
-          padding: "28px 20px",
+          padding: "26px 20px",
           color: "#64748b"
         }}
       >
@@ -573,7 +572,8 @@ export default function Landing({ onGetStarted }) {
             margin: "0 auto",
             display: "flex",
             justifyContent: "space-between",
-            gap: "20px",
+            alignItems: "center",
+            gap: "12px",
             flexWrap: "wrap"
           }}
         >
@@ -596,13 +596,14 @@ function PreviewStat({ value, label }) {
       style={{
         background: "#1e293b",
         borderRadius: "12px",
-        padding: "15px"
+        padding: "14px",
+        minWidth: 0
       }}
     >
       <strong
         style={{
           display: "block",
-          fontSize: "22px"
+          fontSize: "21px"
         }}
       >
         {value}
@@ -629,7 +630,7 @@ function Feature({ icon, title, text }) {
         background: "#ffffff",
         border: "1px solid #e2e8f0",
         borderRadius: "18px",
-        padding: "24px"
+        padding: "22px"
       }}
     >
       <div
@@ -651,7 +652,7 @@ function Feature({ icon, title, text }) {
 
       <h3
         style={{
-          margin: "20px 0 8px",
+          margin: "18px 0 8px",
           fontSize: "18px"
         }}
       >
@@ -679,7 +680,7 @@ function Step({ number, title, text }) {
         background: "#ffffff",
         border: "1px solid #e2e8f0",
         borderRadius: "18px",
-        padding: "26px"
+        padding: "24px"
       }}
     >
       <div
@@ -700,7 +701,7 @@ function Step({ number, title, text }) {
 
       <h3
         style={{
-          margin: "20px 0 8px",
+          margin: "18px 0 8px",
           fontSize: "19px"
         }}
       >
@@ -727,7 +728,7 @@ function DarkProblem({ number, title, text }) {
       style={{
         border: "1px solid #334155",
         borderRadius: "18px",
-        padding: "24px"
+        padding: "22px"
       }}
     >
       <span
@@ -742,7 +743,7 @@ function DarkProblem({ number, title, text }) {
 
       <h3
         style={{
-          margin: "28px 0 8px",
+          margin: "25px 0 8px",
           fontSize: "20px"
         }}
       >
@@ -768,8 +769,10 @@ const navButtonStyle = {
   background: "transparent",
   color: "#475569",
   cursor: "pointer",
-  fontSize: "14px",
-  fontWeight: "600"
+  fontSize: "13px",
+  fontWeight: "600",
+  padding: "9px 7px",
+  whiteSpace: "nowrap"
 };
 
 const primaryButtonStyle = {
@@ -777,9 +780,10 @@ const primaryButtonStyle = {
   background: "#2563eb",
   color: "#ffffff",
   borderRadius: "10px",
-  padding: "10px 16px",
+  padding: "10px 15px",
   cursor: "pointer",
-  fontWeight: "700"
+  fontWeight: "700",
+  whiteSpace: "nowrap"
 };
 
 const secondaryButtonStyle = {
@@ -803,7 +807,7 @@ const sectionEyebrowStyle = {
 const sectionTitleStyle = {
   maxWidth: "700px",
   margin: "14px 0 0",
-  fontSize: "clamp(32px, 4vw, 50px)",
+  fontSize: "clamp(32px, 5vw, 50px)",
   lineHeight: "1.05",
   letterSpacing: "-1.8px"
 };
@@ -811,7 +815,7 @@ const sectionTitleStyle = {
 const darkSectionTitleStyle = {
   maxWidth: "700px",
   margin: "14px 0 0",
-  fontSize: "clamp(32px, 4vw, 50px)",
+  fontSize: "clamp(32px, 5vw, 50px)",
   lineHeight: "1.05",
   letterSpacing: "-1.8px"
 };
