@@ -559,33 +559,51 @@ export default function Landing({ onGetStarted }) {
       </main>
 
       {/* Footer */}
-      <footer
+<footer
+  style={{
+    borderTop: "1px solid #e2e8f0",
+    padding: "28px 20px",
+    color: "#64748b"
+  }}
+>
+  <div
+    style={{
+      maxWidth: "1180px",
+      margin: "0 auto",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: "20px",
+      flexWrap: "wrap"
+    }}
+  >
+    <div>
+      <strong style={{ color: "#0f172a" }}>
+        PayQuick
+      </strong>
+
+      <span style={{ marginLeft: "14px" }}>
+        Stablecoin payments on Arc.
+      </span>
+    </div>
+
+    <div style={{ fontSize: "14px" }}>
+      Built by{" "}
+      <a
+        href="https://x.com/nass_web3"
+        target="_blank"
+        rel="noopener noreferrer"
         style={{
-          borderTop: "1px solid #e2e8f0",
-          padding: "26px 20px",
-          color: "#64748b"
+          color: "#2563eb",
+          fontWeight: "700",
+          textDecoration: "none"
         }}
       >
-        <div
-          style={{
-            maxWidth: "1180px",
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap"
-          }}
-        >
-          <strong style={{ color: "#0f172a" }}>
-            PayQuick
-          </strong>
-
-          <span>
-            Stablecoin payments on Arc.
-          </span>
-        </div>
-      </footer>
+        @nass_web3
+      </a>
+    </div>
+  </div>
+</footer>
     </div>
   );
 }
