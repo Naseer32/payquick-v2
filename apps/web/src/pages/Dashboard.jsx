@@ -69,12 +69,15 @@ export default function Dashboard({ merchant, darkMode }) {
     setStatsError("");
 
     try {
-      const [paymentsResult, invoicesResult, customersResult] =
-        await Promise.all([
-          apiRequest("/api/payments"),
-          apiRequest("/api/invoices"),
-          apiRequest("/api/customers")
-        ]);
+      const [
+        paymentsResult,
+        invoicesResult,
+        customersResult
+      ] = await Promise.all([
+        apiRequest("/api/payments"),
+        apiRequest("/api/invoices"),
+        apiRequest("/api/customers")
+      ]);
 
       const payments = paymentsResult.payments || [];
       const invoices = invoicesResult.invoices || [];
@@ -105,10 +108,14 @@ export default function Dashboard({ merchant, darkMode }) {
         currency
       });
     } catch (err) {
-      console.error("PayQuick dashboard stats failed:", err);
+      console.error(
+        "PayQuick dashboard stats failed:",
+        err
+      );
 
       setStatsError(
-        err.message || "Unable to load dashboard statistics."
+        err.message ||
+          "Unable to load dashboard statistics."
       );
     } finally {
       setLoadingStats(false);
@@ -139,7 +146,6 @@ export default function Dashboard({ merchant, darkMode }) {
     ? {
         background: "#0f172a",
         card: "#111827",
-        cardHover: "#1e293b",
         text: "#f8fafc",
         muted: "#94a3b8",
         border: "#334155",
@@ -149,7 +155,6 @@ export default function Dashboard({ merchant, darkMode }) {
     : {
         background: "#f8fafc",
         card: "#ffffff",
-        cardHover: "#f1f5f9",
         text: "#0f172a",
         muted: "#64748b",
         border: "#e2e8f0",
@@ -437,85 +442,23 @@ export default function Dashboard({ merchant, darkMode }) {
                     fontSize: "13px"
                   }}
                 >
-                  Payments
-                </p>
-
-                <strong
-                  style={{
-                    fontSize: "28px"
-                  }}
-                >
-                  {loadingStats ? "..." : stats.payments}
-                </strong>
-
-                <p
-                  style={{
-                    margin: "8px 0 0",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Payment activity
-                </p>
-              </div>
-
-              <div style={cardStyle}>
-                <p
-                  style={{
-                    margin: "0 0 12px",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Invoices
-                </p>
-
-                <strong
-                  style={{
-                    fontSize: "28px"
-                  }}
-                >
-                  {loadingStats ? "..." : stats.invoices}
-                </strong>
-
-                <p
-                  style={{
-                    margin: "8px 0 0",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Invoice activity
-                </p>
-              </div>
-
-                          <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(auto-fit, minmax(210px, 1fr))",
-                gap: "16px",
-                marginBottom: "20px"
-              }}
-            >
-              <div style={cardStyle}>
-                <p
-                  style={{
-                    margin: "0 0 12px",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
                   Total Received
                 </p>
 
-                <strong style={{ fontSize: "28px" }}>
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
                   {loadingStats
                     ? "..."
-                    : `${stats.totalReceived.toLocaleString(undefined, {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                      })} ${stats.currency}`}
+                    : `${stats.totalReceived.toLocaleString(
+                        undefined,
+                        {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 2
+                        }
+                      )} ${stats.currency}`}
                 </strong>
 
                 <p
@@ -540,8 +483,14 @@ export default function Dashboard({ merchant, darkMode }) {
                   Payments
                 </p>
 
-                <strong style={{ fontSize: "28px" }}>
-                  {loadingStats ? "..." : stats.payments}
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  {loadingStats
+                    ? "..."
+                    : stats.payments}
                 </strong>
 
                 <p
@@ -566,8 +515,14 @@ export default function Dashboard({ merchant, darkMode }) {
                   Invoices
                 </p>
 
-                <strong style={{ fontSize: "28px" }}>
-                  {loadingStats ? "..." : stats.invoices}
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  {loadingStats
+                    ? "..."
+                    : stats.invoices}
                 </strong>
 
                 <p
@@ -592,8 +547,14 @@ export default function Dashboard({ merchant, darkMode }) {
                   Customers
                 </p>
 
-                <strong style={{ fontSize: "28px" }}>
-                  {loadingStats ? "..." : stats.customers}
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  {loadingStats
+                    ? "..."
+                    : stats.customers}
                 </strong>
 
                 <p
@@ -605,8 +566,8 @@ export default function Dashboard({ merchant, darkMode }) {
                 >
                   Customer records
                 </p>
+              </div>
             </div>
-
 
             {showNotifications && (
               <div style={cardStyle}>
@@ -751,36 +712,4 @@ export default function Dashboard({ merchant, darkMode }) {
                             </div>
 
                             {!notification.read_at && (
-                                                            <button
-                                type="button"
-                                onClick={() =>
-                                  markAsRead(notification.id)
-                                }
-                                style={{
-                                  marginTop: "10px",
-                                  border: "none",
-                                  background: "transparent",
-                                  color: theme.primary,
-                                  padding: 0,
-                                  cursor: "pointer",
-                                  fontWeight: "600"
-                                }}
-                              >
-                                Mark as read
-                              </button>
-                            )}
-                          </article>
-                        )
-                      )}
-                    </div>
-                  )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
-            
-           
+                              <b
