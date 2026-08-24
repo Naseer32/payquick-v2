@@ -74,7 +74,12 @@ export default function App() {
 
       case "dashboard":
       default:
-        return <Dashboard merchant={merchant} />;
+        return (
+  <Dashboard
+    merchant={merchant}
+    darkMode={darkMode}
+  />
+);
     }
   }
 
