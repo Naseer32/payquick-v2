@@ -6,8 +6,7 @@ import {
 
 import {
   connectWallet,
-  getChainId,
-  isArcTestnet,
+  ensureArcTestnet,
   signMessage
 } from "./blockchain.js";
 
@@ -45,18 +44,8 @@ export async function authenticateWallet() {
       walletAddress
     );
 
-    const chainId = await getChainId();
-
-    console.log(
-      "PayQuick: chain ID",
-      chainId
-    );
-
-    if (!isArcTestnet(chainId)) {
-      throw new Error(
-        "Please switch your wallet to Arc Testnet."
-      );
-    }
+    const chainId = await ensureArcTestnet();
+console.log("PayQuick: chain ID", chainId);
 
     console.log(
       "PayQuick: requesting challenge"
