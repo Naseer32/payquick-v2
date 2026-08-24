@@ -562,7 +562,7 @@ export default function Landing({ onGetStarted }) {
 <footer
   style={{
     borderTop: "1px solid #e2e8f0",
-    padding: "26px 20px",
+    padding: "28px 20px",
     color: "#64748b"
   }}
 >
@@ -573,17 +573,24 @@ export default function Landing({ onGetStarted }) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: "16px",
+      gap: "20px",
       flexWrap: "wrap"
     }}
   >
     <div>
-      <strong style={{ color: "#0f172a" }}>
+      <strong
+        style={{
+          display: "block",
+          color: "#0f172a",
+          fontSize: "18px",
+          marginBottom: "5px"
+        }}
+      >
         PayQuick
       </strong>
 
-      <span style={{ marginLeft: "10px" }}>
-        Stablecoin payments on Arc.
+      <span>
+        A stablecoin payment platform on Arc.
       </span>
     </div>
 
@@ -591,7 +598,7 @@ export default function Landing({ onGetStarted }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "14px",
+        gap: "18px",
         flexWrap: "wrap"
       }}
     >
@@ -605,12 +612,8 @@ export default function Landing({ onGetStarted }) {
           fontWeight: "600"
         }}
       >
-        X @nass_web3
+        X: @nass_web3
       </a>
-
-      <span style={{ color: "#cbd5e1" }}>
-        |
-      </span>
 
       <a
         href="https://github.com/Naseer32"
@@ -622,15 +625,11 @@ export default function Landing({ onGetStarted }) {
           fontWeight: "600"
         }}
       >
-        GitHub Naseer32
+        GitHub: Naseer32
       </a>
 
-      <span style={{ color: "#cbd5e1" }}>
-        |
-      </span>
-
       <a
-        href="https://discord.com"
+        href="https://discord.com/nassuba"
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -639,11 +638,12 @@ export default function Landing({ onGetStarted }) {
           fontWeight: "600"
         }}
       >
-        Discord nassuba
+        Discord: nassuba
       </a>
     </div>
   </div>
 </footer>
+        
 
     </div>
   );
