@@ -591,38 +591,49 @@ export default function Landing({ onGetStarted }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "14px"
+        gap: "14px",
+        flexWrap: "wrap"
       }}
     >
       <a
         href="https://x.com/nass_web3"
         target="_blank"
         rel="noopener noreferrer"
-        style={{
-          color: "#0f172a",
-          textDecoration: "none",
-          fontWeight: "600"
-        }}
+        style={footerLinkStyle}
       >
         X @nass_web3
       </a>
 
-      <span style={{ color: "#cbd5e1" }}>
-        |
+      <span>|</span>
+
+      <span style={{ color: "#64748b" }}>
+        Discord nassuba
       </span>
 
+      <span>|</span>
+
       <a
-        href="https://discord.com/users/YOUR_DISCORD_USER_ID"
+        href="https://github.com/Naseer32"
         target="_blank"
         rel="noopener noreferrer"
-        style={{
-          color: "#0f172a",
-          textDecoration: "none",
-          fontWeight: "600"
-        }}
+        style={footerLinkStyle}
       >
-        Discord nassuba
+        GitHub
       </a>
+
+      <span>|</span>
+
+      <span>
+        Built by{" "}
+        <a
+          href="https://x.com/nass_web3"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={footerLinkStyle}
+        >
+          @nass_web3
+        </a>
+      </span>
     </div>
   </div>
 </footer>
