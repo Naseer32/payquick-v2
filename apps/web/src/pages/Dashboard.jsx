@@ -712,4 +712,38 @@ export default function Dashboard({ merchant, darkMode }) {
                             </div>
 
                             {!notification.read_at && (
-                              <b
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  markAsRead(
+                                    notification.id
+                                  )
+                                }
+                                style={{
+                                  marginTop: "10px",
+                                  border: "none",
+                                  background:
+                                    "transparent",
+                                  color:
+                                    theme.primary,
+                                  padding: 0,
+                                  cursor: "pointer",
+                                  fontWeight: "600"
+                                }}
+                              >
+                                Mark as read
+                              </button>
+                            )}
+                          </article>
+                        )
+                      )}
+                    </div>
+                  )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
