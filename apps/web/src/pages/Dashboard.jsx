@@ -625,7 +625,6 @@ export default function Dashboard({ merchant, darkMode }) {
       Customer records
     </p>
   </div>
-</div>
 
             {showNotifications && (
               <div style={cardStyle}>
