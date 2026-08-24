@@ -8,11 +8,7 @@ export default function Dashboard({ merchant }) {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const [darkMode, setDarkMode] = useState(() => {
-    try {
-      return localStorage.getItem("payquick_theme") === "dark";
-    } catch {
-      return false;
-    }
+    return localStorage.getItem("payquick_theme") === "dark";
   });
 
   async function loadNotifications() {
@@ -60,14 +56,10 @@ export default function Dashboard({ merchant }) {
   }
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        "payquick_theme",
-        darkMode ? "dark" : "light"
-      );
-    } catch {
-      // Ignore localStorage errors.
-    }
+    localStorage.setItem(
+      "payquick_theme",
+      darkMode ? "dark" : "light"
+    );
   }, [darkMode]);
 
   useEffect(() => {
@@ -84,25 +76,26 @@ export default function Dashboard({ merchant }) {
     (notification) => !notification.read_at
   ).length;
 
-  const theme = {
-    page: darkMode ? "#0f172a" : "#f8fafc",
-    card: darkMode ? "#111827" : "#ffffff",
-    cardSecondary: darkMode ? "#1e293b" : "#f8fafc",
-    text: darkMode ? "#f8fafc" : "#0f172a",
-    muted: darkMode ? "#94a3b8" : "#64748b",
-    border: darkMode ? "#334155" : "#e2e8f0",
-    accent: "#2563eb",
-    accentHover: "#1d4ed8",
-    success: darkMode ? "#34d399" : "#059669",
-    danger: "#ef4444"
-  };
+  const theme = darkMode
+    ? {
+        background: "#0f172a",
+        card: "#111827",
+        text: "#f8fafc",
+        muted: "#94a3b8",
+        border: "#334155",
+        button: "#1e293b"
+      }
+    : {
+        background: "#f8fafc",
+        card: "#ffffff",
+        text: "#0f172a",
+        muted: "#64748b",
+        border: "#e2e8f0",
+        button: "#ffffff"
+      };
 
   function shortenAddress(address) {
     if (!address) return "";
-
-    if (address.length <= 14) {
-      return address;
-    }
 
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   }
@@ -111,16 +104,15 @@ export default function Dashboard({ merchant }) {
     <section
       style={{
         minHeight: "100%",
-        background: theme.page,
+        background: theme.background,
         color: theme.text,
         padding: "24px",
-        boxSizing: "border-box",
-        transition: "background 0.2s ease, color 0.2s ease"
+        boxSizing: "border-box"
       }}
     >
       <div
         style={{
-          maxWidth: "1200px",
+          maxWidth: "1100px",
           margin: "0 auto"
         }}
       >
@@ -130,14 +122,13 @@ export default function Dashboard({ merchant }) {
             justifyContent: "space-between",
             alignItems: "center",
             gap: "16px",
-            marginBottom: "28px",
-            flexWrap: "wrap"
+            marginBottom: "24px"
           }}
         >
           <div>
             <p
               style={{
-                margin: "0 0 6px",
+                margin: "0 0 5px",
                 color: theme.muted,
                 fontSize: "14px"
               }}
@@ -148,8 +139,7 @@ export default function Dashboard({ merchant }) {
             <h2
               style={{
                 margin: 0,
-                fontSize: "30px",
-                lineHeight: 1.2
+                fontSize: "30px"
               }}
             >
               Dashboard
@@ -168,19 +158,14 @@ export default function Dashboard({ merchant }) {
               onClick={() =>
                 setDarkMode((current) => !current)
               }
-              aria-label={
+              title={
                 darkMode
                   ? "Switch to light mode"
                   : "Switch to dark mode"
               }
-              title={
-                darkMode
-                  ? "Light mode"
-                  : "Dark mode"
-              }
               style={{
                 border: `1px solid ${theme.border}`,
-                background: theme.card,
+                background: theme.button,
                 color: theme.text,
                 borderRadius: "10px",
                 padding: "10px 12px",
@@ -199,12 +184,11 @@ export default function Dashboard({ merchant }) {
                     (current) => !current
                   )
                 }
-                aria-label="Notifications"
                 title="Notifications"
                 style={{
                   position: "relative",
                   border: `1px solid ${theme.border}`,
-                  background: theme.card,
+                  background: theme.button,
                   color: theme.text,
                   borderRadius: "10px",
                   padding: "10px 12px",
@@ -223,15 +207,13 @@ export default function Dashboard({ merchant }) {
                       minWidth: "19px",
                       height: "19px",
                       borderRadius: "50%",
-                      background: theme.danger,
+                      background: "#ef4444",
                       color: "#ffffff",
                       fontSize: "10px",
                       fontWeight: "700",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      padding: "0 4px",
-                      boxSizing: "border-box"
+                      justifyContent: "center"
                     }}
                   >
                     {unreadCount > 99
@@ -254,42 +236,23 @@ export default function Dashboard({ merchant }) {
               textAlign: "center"
             }}
           >
-            <div
-              style={{
-                fontSize: "40px",
-                marginBottom: "12px"
-              }}
-            >
-              💳
-            </div>
-
-            <h3 style={{ margin: "0 0 8px" }}>
-              Welcome to PayQuick
-            </h3>
+            <h3>Welcome to PayQuick</h3>
 
             <p
               style={{
-                margin: 0,
                 color: theme.muted
               }}
             >
-              Connect your wallet to access your
-              merchant dashboard.
+              Connect your wallet to access your merchant
+              dashboard.
             </p>
           </div>
         ) : (
           <>
             <div
               style={{
-                background:
-                  darkMode
-                    ? "#172554"
-                    : "#eff6ff",
-                border: `1px solid ${
-                  darkMode
-                    ? "#1e40af"
-                    : "#bfdbfe"
-                }`,
+                background: theme.card,
+                border: `1px solid ${theme.border}`,
                 borderRadius: "16px",
                 padding: "20px",
                 marginBottom: "20px"
@@ -297,148 +260,19 @@ export default function Dashboard({ merchant }) {
             >
               <p
                 style={{
-                  margin: "0 0 6px",
+                  margin: "0 0 8px",
                   color: theme.muted,
                   fontSize: "13px"
                 }}
               >
-                Connected merchant wallet
+                Merchant wallet
               </p>
 
-              <strong
-                style={{
-                  fontSize: "16px",
-                  wordBreak: "break-all"
-                }}
-              >
+              <strong>
                 {shortenAddress(
                   merchant.wallet_address
                 )}
               </strong>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(auto-fit, minmax(210px, 1fr))",
-                gap: "16px",
-                marginBottom: "24px"
-              }}
-            >
-              <div
-                style={{
-                  background: theme.card,
-                  border: `1px solid ${theme.border}`,
-                  borderRadius: "16px",
-                  padding: "20px"
-                }}
-              >
-                <p
-                  style={{
-                    margin: "0 0 10px",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Balance
-                </p>
-
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: "25px"
-                  }}
-                >
-                  USDC
-                </h3>
-
-                <p
-                  style={{
-                    margin: "6px 0 0",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Arc Testnet
-                </p>
-              </div>
-
-              <div
-                style={{
-                  background: theme.card,
-                  border: `1px solid ${theme.border}`,
-                  borderRadius: "16px",
-                  padding: "20px"
-                }}
-              >
-                <p
-                  style={{
-                    margin: "0 0 10px",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Payments
-                </p>
-
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: "25px"
-                  }}
-                >
-                  —
-                </h3>
-
-                <p
-                  style={{
-                    margin: "6px 0 0",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  View payment history
-                </p>
-              </div>
-
-              <div
-                style={{
-                  background: theme.card,
-                  border: `1px solid ${theme.border}`,
-                  borderRadius: "16px",
-                  padding: "20px"
-                }}
-              >
-                <p
-                  style={{
-                    margin: "0 0 10px",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Notifications
-                </p>
-
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: "25px"
-                  }}
-                >
-                  {unreadCount}
-                </h3>
-
-                <p
-                  style={{
-                    margin: "6px 0 0",
-                    color: theme.muted,
-                    fontSize: "13px"
-                  }}
-                >
-                  Unread notifications
-                </p>
-              </div>
             </div>
 
             {showNotifications && (
@@ -447,8 +281,7 @@ export default function Dashboard({ merchant }) {
                   background: theme.card,
                   border: `1px solid ${theme.border}`,
                   borderRadius: "16px",
-                  padding: "20px",
-                  marginBottom: "24px"
+                  padding: "20px"
                 }}
               >
                 <div
@@ -457,28 +290,12 @@ export default function Dashboard({ merchant }) {
                     justifyContent: "space-between",
                     alignItems: "center",
                     gap: "12px",
-                    marginBottom: "12px"
+                    marginBottom: "16px"
                   }}
                 >
-                  <div>
-                    <h3
-                      style={{
-                        margin: 0
-                      }}
-                    >
-                      Notifications
-                    </h3>
-
-                    <p
-                      style={{
-                        margin: "4px 0 0",
-                        color: theme.muted,
-                        fontSize: "13px"
-                      }}
-                    >
-                      Your latest account activity
-                    </p>
-                  </div>
+                  <h3 style={{ margin: 0 }}>
+                    Notifications
+                  </h3>
 
                   <button
                     type="button"
@@ -486,13 +303,11 @@ export default function Dashboard({ merchant }) {
                     disabled={loadingNotifications}
                     style={{
                       border: `1px solid ${theme.border}`,
-                      background: theme.cardSecondary,
+                      background: theme.button,
                       color: theme.text,
                       borderRadius: "8px",
                       padding: "8px 12px",
-                      cursor: loadingNotifications
-                        ? "default"
-                        : "pointer"
+                      cursor: "pointer"
                     }}
                   >
                     {loadingNotifications
@@ -502,36 +317,20 @@ export default function Dashboard({ merchant }) {
                 </div>
 
                 {notificationError && (
-                  <p
-                    role="alert"
-                    style={{
-                      color: theme.danger
-                    }}
-                  >
+                  <p role="alert">
                     {notificationError}
                   </p>
                 )}
 
                 {!loadingNotifications &&
                   notifications.length === 0 && (
-                    <div
+                    <p
                       style={{
-                        background:
-                          theme.cardSecondary,
-                        borderRadius: "10px",
-                        padding: "20px",
-                        textAlign: "center"
+                        color: theme.muted
                       }}
                     >
-                      <p
-                        style={{
-                          margin: 0,
-                          color: theme.muted
-                        }}
-                      >
-                        No notifications yet.
-                      </p>
-                    </div>
+                      No notifications yet.
+                    </p>
                   )}
 
                 {!loadingNotifications &&
@@ -546,123 +345,84 @@ export default function Dashboard({ merchant }) {
                               padding: "16px 0"
                             }}
                           >
-                            <div
+                            <h4
                               style={{
-                                display: "flex",
-                                justifyContent:
-                                  "space-between",
-                                gap: "12px",
-                                alignItems:
-                                  "flex-start"
+                                margin:
+                                  "0 0 8px"
                               }}
                             >
-                              <div>
-                                <h4
-                                  style={{
-                                    margin:
-                                      "0 0 6px"
-                                  }}
-                                >
-                                  {
-                                    notification.title
-                                  }
-                                </h4>
+                              {
+                                notification.title
+                              }
+                            </h4>
 
-                                {notification.body && (
-                                  <p
-                                    style={{
-                                      margin:
-                                        "0 0 8px",
-                                      color:
-                                        theme.muted
-                                    }}
-                                  >
-                                    {
-                                      notification.body
-                                    }
-                                  </p>
-                                )}
-
-                                <small
-                                  style={{
-                                    color:
-                                      theme.muted
-                                  }}
-                                >
-                                  {new Date(
-                                    notification.created_at
-                                  ).toLocaleString()}
-                                </small>
-                              </div>
-
-                              {!notification.read_at && (
-                                <span
-                                  style={{
-                                    background:
-                                      darkMode
-                                        ? "#422006"
-                                        : "#fef3c7",
-                                    color:
-                                      darkMode
-                                        ? "#fbbf24"
-                                        : "#92400e",
-                                    borderRadius:
-                                      "999px",
-                                    padding:
-                                      "4px 8px",
-                                    fontSize:
-                                      "11px",
-                                    fontWeight:
-                                      "600",
-                                    whiteSpace:
-                                      "nowrap"
-                                  }}
-                                >
-                                  Unread
-                                </span>
-                              )}
-                            </div>
-
-                            {!notification.read_at && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  markAsRead(
-                                    notification.id
-                                  )
-                                }
+                            {notification.body && (
+                              <p
                                 style={{
-                                  marginTop:
-                                    "10px",
-                                  border: "none",
-                                  background:
-                                    "transparent",
                                   color:
-                                    theme.accent,
-                                  padding: 0,
-                                  cursor:
-                                    "pointer",
-                                  fontWeight:
-                                    "600"
+                                    theme.muted
                                 }}
                               >
-                                Mark as read
-                              </button>
+                                {
+                                  notification.body
+                                }
+                              </p>
                             )}
 
-                            {notification.read_at && (
-                              <small
+                            <small
+                              style={{
+                                color:
+                                  theme.muted
+                              }}
+                            >
+                              {new Date(
+                                notification.created_at
+                              ).toLocaleString()}
+                            </small>
+
+                            {notification.read_at ? (
+                              <p
                                 style={{
-                                  display:
-                                    "block",
-                                  marginTop:
-                                    "8px",
                                   color:
-                                    theme.success
+                                    "#059669"
                                 }}
                               >
                                 ✓ Read
-                              </small>
+                              </p>
+                            ) : (
+                              <div>
+                                <strong>
+                                  Unread
+                                </strong>
+
+                                <br />
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    markAsRead(
+                                      notification.id
+                                    )
+                                  }
+                                  style={{
+                                    marginTop:
+                                      "8px",
+                                    border:
+                                      "none",
+                                    background:
+                                      "transparent",
+                                    color:
+                                      "#2563eb",
+                                    padding: 0,
+                                    cursor:
+                                      "pointer",
+                                    fontWeight:
+                                      "600"
+                                  }}
+                                >
+                                  Mark as read
+                                </button>
+                              </div>
                             )}
                           </article>
                         )
@@ -670,3 +430,10 @@ export default function Dashboard({ merchant }) {
                     </div>
                   )}
               </div>
+            )}
+          </>
+        )}
+      </div>
+    </section>
+  );
+                            }
