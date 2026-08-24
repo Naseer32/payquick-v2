@@ -562,7 +562,7 @@ export default function Landing({ onGetStarted }) {
 <footer
   style={{
     borderTop: "1px solid #e2e8f0",
-    padding: "28px 20px",
+    padding: "30px 20px",
     color: "#64748b"
   }}
 >
@@ -573,34 +573,70 @@ export default function Landing({ onGetStarted }) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: "20px",
+      gap: "18px",
       flexWrap: "wrap"
     }}
   >
     <div>
-      <strong style={{ color: "#0f172a" }}>
+      <strong
+        style={{
+          display: "block",
+          color: "#0f172a",
+          fontSize: "16px",
+          marginBottom: "5px"
+        }}
+      >
         PayQuick
       </strong>
 
-      <span style={{ marginLeft: "14px" }}>
+      <span style={{ fontSize: "13px" }}>
         Stablecoin payments on Arc.
       </span>
     </div>
 
-    <div style={{ fontSize: "14px" }}>
-      Built by{" "}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "14px",
+        flexWrap: "wrap"
+      }}
+    >
+      <span style={{ fontSize: "13px" }}>
+        Built by @nass_web3
+      </span>
+
       <a
-        href="https://x.com/nass_web3"
+        href="https://github.com/Naseer32"
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          color: "#2563eb",
-          fontWeight: "700",
-          textDecoration: "none"
+          color: "#0f172a",
+          textDecoration: "none",
+          fontSize: "13px",
+          fontWeight: "600"
         }}
       >
-        @nass_web3
+        GitHub
       </a>
+
+      <span
+        style={{
+          color: "#cbd5e1"
+        }}
+      >
+        |
+      </span>
+
+      <span
+        style={{
+          color: "#0f172a",
+          fontSize: "13px",
+          fontWeight: "600"
+        }}
+      >
+        Discord: nassuba
+      </span>
     </div>
   </div>
 </footer>
