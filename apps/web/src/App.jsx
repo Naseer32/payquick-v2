@@ -10,13 +10,48 @@ import WalletButton from "./components/WalletButton.jsx";
 
 export default function App() {
   const [merchant, setMerchant] = useState(null);
+
   const [activeSection, setActiveSection] = useState("dashboard");
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    const currentPath = window.location.pathname;
+
+    if (currentPath.startsWith("/pay/")) {
+      return "checkout";
+    }
+
+    if (currentPath === "/dashboard") {
+      return "dashboard";
+    }
+
+    if (currentPath === "/invoices") {
+      return "invoices";
+    }
+
+    if (currentPath === "/payments") {
+      return "payments";
+    }
+
+    if (currentPath === "/customers") {
+      return "customers";
+    }
+
+    return "landing";
+  });
+
+  const [checkoutToken] = useState(() => {
+    const currentPath = window.location.pathname;
+
+    if (currentPath.startsWith("/pay/")) {
+      return currentPath.slice("/pay/".length);
+    }
+
+    return "";
+  });
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("payquick_theme") === "dark";
   });
-
-  const path = window.location.pathname;
 
   useEffect(() => {
     localStorage.setItem(
@@ -25,16 +60,94 @@ export default function App() {
     );
   }, [darkMode]);
 
-  // Payment checkout route
-  if (path.startsWith("/pay/")) {
-    const checkoutToken = path.slice("/pay/".length);
+  function navigate(page) {
+    setCurrentPage(page);
 
+    if (page === "landing") {
+      window.history.pushState({}, "", "/");
+      return;
+    }
+
+    if (page === "dashboard") {
+      window.history.pushState({}, "", "/dashboard");
+      setActiveSection("dashboard");
+      return;
+    }
+
+    if (page === "invoices") {
+      window.history.pushState({}, "", "/invoices");
+      setActiveSection("invoices");
+      return;
+    }
+
+    if (page === "payments") {
+      window.history.pushState({}, "", "/payments");
+      setActiveSection("payments");
+      return;
+    }
+
+    if (page === "customers") {
+      window.history.pushState({}, "", "/customers");
+      setActiveSection("customers");
+    }
+  }
+
+  useEffect(() => {
+    function handlePopState() {
+      const currentPath = window.location.pathname;
+
+      if (currentPath === "/") {
+        setCurrentPage("landing");
+        return;
+      }
+
+      if (currentPath === "/dashboard") {
+        setCurrentPage("dashboard");
+        setActiveSection("dashboard");
+        return;
+      }
+
+      if (currentPath === "/invoices") {
+        setCurrentPage("invoices");
+        setActiveSection("invoices");
+        return;
+      }
+
+      if (currentPath === "/payments") {
+        setCurrentPage("payments");
+        setActiveSection("payments");
+        return;
+      }
+
+      if (currentPath === "/customers") {
+        setCurrentPage("customers");
+        setActiveSection("customers");
+        return;
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  /*
+   * PAYMENT CHECKOUT
+   * This remains separate from the landing page and dashboard.
+   */
+  if (currentPage === "checkout") {
     return (
       <main
         style={{
           minHeight: "100vh",
-          background: darkMode ? "#0f172a" : "#ffffff",
-          color: darkMode ? "#f8fafc" : "#0f172a"
+          background: darkMode
+            ? "#0f172a"
+            : "#ffffff",
+          color: darkMode
+            ? "#f8fafc"
+            : "#0f172a"
         }}
       >
         <Checkout checkoutToken={checkoutToken} />
@@ -42,13 +155,14 @@ export default function App() {
     );
   }
 
-  // Landing page
-  if (path === "/") {
+  /*
+   * LANDING PAGE
+   */
+  if (currentPage === "landing") {
     return (
       <Landing
         onGetStarted={() => {
-          window.history.pushState({}, "", "/dashboard");
-          window.location.reload();
+          navigate("dashboard");
         }}
       />
     );
@@ -74,16 +188,33 @@ export default function App() {
         primary: "#2563eb"
       };
 
+  function handleNavigation(section) {
+    setActiveSection(section);
+    setCurrentPage(section);
+
+    window.history.pushState(
+      {},
+      "",
+      `/${section}`
+    );
+  }
+
   function renderSection() {
     switch (activeSection) {
       case "invoices":
-        return <Invoices merchant={merchant} />;
+        return (
+          <Invoices merchant={merchant} />
+        );
 
       case "payments":
-        return <Payments merchant={merchant} />;
+        return (
+          <Payments merchant={merchant} />
+        );
 
       case "customers":
-        return <Customers merchant={merchant} />;
+        return (
+          <Customers merchant={merchant} />
+        );
 
       case "dashboard":
       default:
@@ -121,7 +252,8 @@ export default function App() {
         minHeight: "100vh",
         background: theme.background,
         color: theme.text,
-        transition: "background 0.2s ease, color 0.2s ease"
+        transition:
+          "background 0.2s ease, color 0.2s ease"
       }}
     >
       <header
@@ -130,7 +262,8 @@ export default function App() {
           top: 0,
           zIndex: 100,
           background: theme.surface,
-          borderBottom: `1px solid ${theme.border}`,
+          borderBottom:
+            `1px solid ${theme.border}`,
           padding: "14px 20px"
         }}
       >
@@ -149,23 +282,24 @@ export default function App() {
               flexWrap: "wrap"
             }}
           >
+            {/* PAYQUICK LOGO */}
             <button
-  type="button"
-  onClick={() => {
-    window.location.href = "/";
-  }}
-  style={{
-    border: "none",
-    background: "transparent",
-    color: theme.text,
-    cursor: "pointer",
-    fontSize: "22px",
-    fontWeight: "800",
-    padding: 0
-  }}
->
-  PayQuick
-</button>
+              type="button"
+              onClick={() => {
+                navigate("landing");
+              }}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: theme.text,
+                cursor: "pointer",
+                fontSize: "22px",
+                fontWeight: "800",
+                padding: 0
+              }}
+            >
+              PayQuick
+            </button>
 
             <div
               style={{
@@ -177,7 +311,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={() =>
-                  setDarkMode((current) => !current)
+                  setDarkMode(
+                    (current) => !current
+                  )
                 }
                 title={
                   darkMode
@@ -185,7 +321,8 @@ export default function App() {
                     : "Switch to dark mode"
                 }
                 style={{
-                  border: `1px solid ${theme.border}`,
+                  border:
+                    `1px solid ${theme.border}`,
                   background: theme.surface,
                   color: theme.text,
                   borderRadius: "9px",
@@ -194,11 +331,15 @@ export default function App() {
                   fontSize: "16px"
                 }}
               >
-                {darkMode ? "☀️" : "🌙"}
+                {darkMode
+                  ? "☀️"
+                  : "🌙"}
               </button>
 
               <WalletButton
-                onAuthenticated={setMerchant}
+                onAuthenticated={
+                  setMerchant
+                }
               />
             </div>
           </div>
@@ -221,13 +362,16 @@ export default function App() {
                   key={item.id}
                   type="button"
                   onClick={() =>
-                    setActiveSection(item.id)
+                    handleNavigation(
+                      item.id
+                    )
                   }
                   style={{
                     border: "none",
                     borderRadius: "8px",
                     padding: "9px 14px",
-                    whiteSpace: "nowrap",
+                    whiteSpace:
+                      "nowrap",
                     cursor: "pointer",
                     background: active
                       ? theme.primary
