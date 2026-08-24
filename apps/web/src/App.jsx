@@ -152,8 +152,7 @@ export default function App() {
             <button
   type="button"
   onClick={() => {
-    window.history.pushState({}, "", "/");
-    window.location.reload();
+    window.location.href = "/";
   }}
   style={{
     border: "none",
