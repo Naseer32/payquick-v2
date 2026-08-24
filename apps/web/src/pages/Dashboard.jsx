@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../services/api.js";
 
-export default function Dashboard({ merchant }) {
+export default function Dashboard({ merchant, darkMode }) {
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
   const [notificationError, setNotificationError] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
-
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("payquick_theme") === "dark";
-  });
 
   async function loadNotifications() {
     if (!merchant) return;
@@ -56,13 +52,6 @@ export default function Dashboard({ merchant }) {
   }
 
   useEffect(() => {
-    localStorage.setItem(
-      "payquick_theme",
-      darkMode ? "dark" : "light"
-    );
-  }, [darkMode]);
-
-  useEffect(() => {
     if (!merchant) {
       setNotifications([]);
       setShowNotifications(false);
@@ -71,10 +60,6 @@ export default function Dashboard({ merchant }) {
 
     loadNotifications();
   }, [merchant]);
-
-  const unreadCount = notifications.filter(
-    (notification) => !notification.read_at
-  ).length;
 
   const theme = darkMode
     ? {
@@ -94,6 +79,10 @@ export default function Dashboard({ merchant }) {
         button: "#ffffff"
       };
 
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read_at
+  ).length;
+
   function shortenAddress(address) {
     if (!address) return "";
 
@@ -103,7 +92,7 @@ export default function Dashboard({ merchant }) {
   return (
     <section
       style={{
-        minHeight: "100%",
+        minHeight: "calc(100vh - 120px)",
         background: theme.background,
         color: theme.text,
         padding: "24px",
@@ -116,7 +105,7 @@ export default function Dashboard({ merchant }) {
           margin: "0 auto"
         }}
       >
-        <header
+        <div
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -146,85 +135,52 @@ export default function Dashboard({ merchant }) {
             </h2>
           </div>
 
-          <div
+          <button
+            type="button"
+            onClick={() =>
+              setShowNotifications(
+                (current) => !current
+              )
+            }
+            title="Notifications"
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px"
+              position: "relative",
+              border: `1px solid ${theme.border}`,
+              background: theme.button,
+              color: theme.text,
+              borderRadius: "10px",
+              padding: "10px 12px",
+              cursor: "pointer",
+              fontSize: "18px"
             }}
           >
-            <button
-              type="button"
-              onClick={() =>
-                setDarkMode((current) => !current)
-              }
-              title={
-                darkMode
-                  ? "Switch to light mode"
-                  : "Switch to dark mode"
-              }
-              style={{
-                border: `1px solid ${theme.border}`,
-                background: theme.button,
-                color: theme.text,
-                borderRadius: "10px",
-                padding: "10px 12px",
-                cursor: "pointer",
-                fontSize: "16px"
-              }}
-            >
-              {darkMode ? "☀️" : "🌙"}
-            </button>
+            🔔
 
-            {merchant && (
-              <button
-                type="button"
-                onClick={() =>
-                  setShowNotifications(
-                    (current) => !current
-                  )
-                }
-                title="Notifications"
+            {unreadCount > 0 && (
+              <span
                 style={{
-                  position: "relative",
-                  border: `1px solid ${theme.border}`,
-                  background: theme.button,
-                  color: theme.text,
-                  borderRadius: "10px",
-                  padding: "10px 12px",
-                  cursor: "pointer",
-                  fontSize: "18px"
+                  position: "absolute",
+                  top: "-6px",
+                  right: "-6px",
+                  minWidth: "19px",
+                  height: "19px",
+                  borderRadius: "50%",
+                  background: "#ef4444",
+                  color: "#ffffff",
+                  fontSize: "10px",
+                  fontWeight: "700",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
                 }}
               >
-                🔔
-
-                {unreadCount > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-6px",
-                      right: "-6px",
-                      minWidth: "19px",
-                      height: "19px",
-                      borderRadius: "50%",
-                      background: "#ef4444",
-                      color: "#ffffff",
-                      fontSize: "10px",
-                      fontWeight: "700",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                  >
-                    {unreadCount > 99
-                      ? "99+"
-                      : unreadCount}
-                  </span>
-                )}
-              </button>
+                {unreadCount > 99
+                  ? "99+"
+                  : unreadCount}
+              </span>
             )}
-          </div>
-        </header>
+          </button>
+        </div>
 
         {!merchant ? (
           <div
@@ -384,7 +340,7 @@ export default function Dashboard({ merchant }) {
                               <p
                                 style={{
                                   color:
-                                    "#059669"
+                                    "#10b981"
                                 }}
                               >
                                 ✓ Read
@@ -412,7 +368,7 @@ export default function Dashboard({ merchant }) {
                                     background:
                                       "transparent",
                                     color:
-                                      "#2563eb",
+                                      "#3b82f6",
                                     padding: 0,
                                     cursor:
                                       "pointer",
@@ -436,4 +392,4 @@ export default function Dashboard({ merchant }) {
       </div>
     </section>
   );
-                            }
+                  }
