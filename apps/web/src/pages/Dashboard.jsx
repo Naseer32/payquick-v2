@@ -497,113 +497,115 @@ export default function Dashboard({ merchant, darkMode }) {
     gap: "16px",
     marginBottom: "20px"
   }}
-<div style={cardStyle}>
-  <p
-    style={{
-      margin: "0 0 12px",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Total Received
-  </p>
+>
+  <div style={cardStyle}>
+    <p
+      style={{
+        margin: "0 0 12px",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Total Received
+    </p>
 
-  <strong style={{ fontSize: "28px" }}>
-    {loadingStats
-      ? "..."
-      : `${stats.totalReceived.toLocaleString(undefined, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2
-        })} ${stats.currency}`}
-  </strong>
+    <strong style={{ fontSize: "28px" }}>
+      {loadingStats
+        ? "..."
+        : `${stats.totalReceived.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          })} ${stats.currency}`}
+    </strong>
 
-  <p
-    style={{
-      margin: "8px 0 0",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Confirmed payments
-  </p>
-</div>
+    <p
+      style={{
+        margin: "8px 0 0",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Confirmed payments
+    </p>
+  </div>
 
-<div style={cardStyle}>
-  <p
-    style={{
-      margin: "0 0 12px",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Payments
-  </p>
+  <div style={cardStyle}>
+    <p
+      style={{
+        margin: "0 0 12px",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Payments
+    </p>
 
-  <strong style={{ fontSize: "28px" }}>
-    {loadingStats ? "..." : stats.payments}
-  </strong>
+    <strong style={{ fontSize: "28px" }}>
+      {loadingStats ? "..." : stats.payments}
+    </strong>
 
-  <p
-    style={{
-      margin: "8px 0 0",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Payment activity
-  </p>
-</div>
+    <p
+      style={{
+        margin: "8px 0 0",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Payment activity
+    </p>
+  </div>
 
-<div style={cardStyle}>
-  <p
-    style={{
-      margin: "0 0 12px",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Invoices
-  </p>
+  <div style={cardStyle}>
+    <p
+      style={{
+        margin: "0 0 12px",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Invoices
+    </p>
 
-  <strong style={{ fontSize: "28px" }}>
-    {loadingStats ? "..." : stats.invoices}
-  </strong>
+    <strong style={{ fontSize: "28px" }}>
+      {loadingStats ? "..." : stats.invoices}
+    </strong>
 
-  <p
-    style={{
-      margin: "8px 0 0",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Invoice activity
-  </p>
-</div>
+    <p
+      style={{
+        margin: "8px 0 0",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Invoice activity
+    </p>
+  </div>
 
-<div style={cardStyle}>
-  <p
-    style={{
-      margin: "0 0 12px",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Customers
-  </p>
+  <div style={cardStyle}>
+    <p
+      style={{
+        margin: "0 0 12px",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Customers
+    </p>
 
-  <strong style={{ fontSize: "28px" }}>
-    {loadingStats ? "..." : stats.customers}
-  </strong>
+    <strong style={{ fontSize: "28px" }}>
+      {loadingStats ? "..." : stats.customers}
+    </strong>
 
-  <p
-    style={{
-      margin: "8px 0 0",
-      color: theme.muted,
-      fontSize: "13px"
-    }}
-  >
-    Customer records
-  </p>
+    <p
+      style={{
+        margin: "8px 0 0",
+        color: theme.muted,
+        fontSize: "13px"
+      }}
+    >
+      Customer records
+    </p>
+  </div>
 </div>
 
             {showNotifications && (
