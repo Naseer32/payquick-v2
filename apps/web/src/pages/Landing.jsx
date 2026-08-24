@@ -562,7 +562,7 @@ export default function Landing({ onGetStarted }) {
 <footer
   style={{
     borderTop: "1px solid #e2e8f0",
-    padding: "30px 20px",
+    padding: "26px 20px",
     color: "#64748b"
   }}
 >
@@ -573,23 +573,16 @@ export default function Landing({ onGetStarted }) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: "18px",
+      gap: "16px",
       flexWrap: "wrap"
     }}
   >
     <div>
-      <strong
-        style={{
-          display: "block",
-          color: "#0f172a",
-          fontSize: "16px",
-          marginBottom: "5px"
-        }}
-      >
+      <strong style={{ color: "#0f172a" }}>
         PayQuick
       </strong>
 
-      <span style={{ fontSize: "13px" }}>
+      <span style={{ marginLeft: "10px" }}>
         Stablecoin payments on Arc.
       </span>
     </div>
@@ -598,45 +591,38 @@ export default function Landing({ onGetStarted }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "14px",
-        flexWrap: "wrap"
+        gap: "14px"
       }}
     >
-      <span style={{ fontSize: "13px" }}>
-        Built by @nass_web3
-      </span>
-
       <a
-        href="https://github.com/Naseer32"
+        href="https://x.com/nass_web3"
         target="_blank"
         rel="noopener noreferrer"
         style={{
           color: "#0f172a",
           textDecoration: "none",
-          fontSize: "13px",
           fontWeight: "600"
         }}
       >
-        GitHub
+        X @nass_web3
       </a>
 
-      <span
-        style={{
-          color: "#cbd5e1"
-        }}
-      >
+      <span style={{ color: "#cbd5e1" }}>
         |
       </span>
 
-      <span
+      <a
+        href="https://discord.com/users/YOUR_DISCORD_USER_ID"
+        target="_blank"
+        rel="noopener noreferrer"
         style={{
           color: "#0f172a",
-          fontSize: "13px",
+          textDecoration: "none",
           fontWeight: "600"
         }}
       >
-        Discord: nassuba
-      </span>
+        Discord nassuba
+      </a>
     </div>
   </div>
 </footer>
