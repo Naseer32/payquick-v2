@@ -65,18 +65,22 @@ export default function Dashboard({ merchant, darkMode }) {
     ? {
         background: "#0f172a",
         card: "#111827",
+        cardHover: "#1e293b",
         text: "#f8fafc",
         muted: "#94a3b8",
         border: "#334155",
-        button: "#1e293b"
+        button: "#1e293b",
+        primary: "#3b82f6"
       }
     : {
         background: "#f8fafc",
         card: "#ffffff",
+        cardHover: "#f1f5f9",
         text: "#0f172a",
         muted: "#64748b",
         border: "#e2e8f0",
-        button: "#ffffff"
+        button: "#ffffff",
+        primary: "#2563eb"
       };
 
   const unreadCount = notifications.filter(
@@ -89,13 +93,30 @@ export default function Dashboard({ merchant, darkMode }) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   }
 
+  const cardStyle = {
+    background: theme.card,
+    border: `1px solid ${theme.border}`,
+    borderRadius: "16px",
+    padding: "20px"
+  };
+
+  const secondaryButtonStyle = {
+    border: `1px solid ${theme.border}`,
+    background: theme.button,
+    color: theme.text,
+    borderRadius: "9px",
+    padding: "9px 13px",
+    cursor: "pointer",
+    fontWeight: "500"
+  };
+
   return (
     <section
       style={{
         minHeight: "calc(100vh - 120px)",
         background: theme.background,
         color: theme.text,
-        padding: "24px",
+        padding: "28px 20px",
         boxSizing: "border-box"
       }}
     >
@@ -105,112 +126,149 @@ export default function Dashboard({ merchant, darkMode }) {
           margin: "0 auto"
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "16px",
-            marginBottom: "24px"
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: "0 0 5px",
-                color: theme.muted,
-                fontSize: "14px"
-              }}
-            >
-              PayQuick
-            </p>
-
-            <h2
-              style={{
-                margin: 0,
-                fontSize: "30px"
-              }}
-            >
-              Dashboard
-            </h2>
-          </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              setShowNotifications(
-                (current) => !current
-              )
-            }
-            title="Notifications"
-            style={{
-              position: "relative",
-              border: `1px solid ${theme.border}`,
-              background: theme.button,
-              color: theme.text,
-              borderRadius: "10px",
-              padding: "10px 12px",
-              cursor: "pointer",
-              fontSize: "18px"
-            }}
-          >
-            🔔
-
-            {unreadCount > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-6px",
-                  right: "-6px",
-                  minWidth: "19px",
-                  height: "19px",
-                  borderRadius: "50%",
-                  background: "#ef4444",
-                  color: "#ffffff",
-                  fontSize: "10px",
-                  fontWeight: "700",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                {unreadCount > 99
-                  ? "99+"
-                  : unreadCount}
-              </span>
-            )}
-          </button>
-        </div>
-
         {!merchant ? (
           <div
             style={{
-              background: theme.card,
-              border: `1px solid ${theme.border}`,
-              borderRadius: "16px",
-              padding: "32px",
-              textAlign: "center"
+              ...cardStyle,
+              maxWidth: "600px",
+              margin: "60px auto",
+              textAlign: "center",
+              padding: "48px 28px"
             }}
           >
-            <h3>Welcome to PayQuick</h3>
+            <div
+              style={{
+                width: "64px",
+                height: "64px",
+                margin: "0 auto 20px",
+                borderRadius: "16px",
+                background: theme.primary,
+                color: "#ffffff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "28px",
+                fontWeight: "700"
+              }}
+            >
+              P
+            </div>
+
+            <h2
+              style={{
+                margin: "0 0 10px",
+                fontSize: "28px"
+              }}
+            >
+              Welcome to PayQuick
+            </h2>
 
             <p
               style={{
-                color: theme.muted
+                margin: 0,
+                color: theme.muted,
+                lineHeight: "1.6"
               }}
             >
               Connect your wallet to access your merchant
-              dashboard.
+              dashboard and manage your payments.
             </p>
           </div>
         ) : (
           <>
             <div
               style={{
-                background: theme.card,
-                border: `1px solid ${theme.border}`,
-                borderRadius: "16px",
-                padding: "20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: "20px",
+                marginBottom: "24px",
+                flexWrap: "wrap"
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    margin: "0 0 6px",
+                    color: theme.muted,
+                    fontSize: "14px"
+                  }}
+                >
+                  Merchant dashboard
+                </p>
+
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: "30px",
+                    letterSpacing: "-0.5px"
+                  }}
+                >
+                  Welcome back
+                </h2>
+
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: theme.muted
+                  }}
+                >
+                  Manage your stablecoin payments from one place.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowNotifications(
+                    (current) => !current
+                  )
+                }
+                title="Notifications"
+                style={{
+                  position: "relative",
+                  border: `1px solid ${theme.border}`,
+                  background: theme.card,
+                  color: theme.text,
+                  borderRadius: "11px",
+                  padding: "11px 14px",
+                  cursor: "pointer",
+                  fontSize: "19px"
+                }}
+              >
+                🔔
+
+                {unreadCount > 0 && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "-7px",
+                      right: "-7px",
+                      minWidth: "20px",
+                      height: "20px",
+                      padding: "0 5px",
+                      borderRadius: "999px",
+                      background: "#ef4444",
+                      color: "#ffffff",
+                      fontSize: "10px",
+                      fontWeight: "700",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxSizing: "border-box"
+                    }}
+                  >
+                    {unreadCount > 99
+                      ? "99+"
+                      : unreadCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            <div
+              style={{
+                ...cardStyle,
                 marginBottom: "20px"
               }}
             >
@@ -221,50 +279,191 @@ export default function Dashboard({ merchant, darkMode }) {
                   fontSize: "13px"
                 }}
               >
-                Merchant wallet
+                Connected wallet
               </p>
 
-              <strong>
-                {shortenAddress(
-                  merchant.wallet_address
-                )}
-              </strong>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "15px",
+                  flexWrap: "wrap"
+                }}
+              >
+                <strong
+                  style={{
+                    fontSize: "17px",
+                    fontFamily:
+                      "ui-monospace, SFMono-Regular, Menlo, monospace"
+                  }}
+                >
+                  {shortenAddress(
+                    merchant.wallet_address
+                  )}
+                </strong>
+
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    color: "#10b981",
+                    fontSize: "13px",
+                    fontWeight: "600"
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: "#10b981"
+                    }}
+                  />
+                  Connected
+                </span>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(210px, 1fr))",
+                gap: "16px",
+                marginBottom: "20px"
+              }}
+            >
+              <div style={cardStyle}>
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Payments
+                </p>
+
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  --
+                </strong>
+
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Payment activity
+                </p>
+              </div>
+
+              <div style={cardStyle}>
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Invoices
+                </p>
+
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  --
+                </strong>
+
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Invoice activity
+                </p>
+              </div>
+
+              <div style={cardStyle}>
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Customers
+                </p>
+
+                <strong
+                  style={{
+                    fontSize: "28px"
+                  }}
+                >
+                  --
+                </strong>
+
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: theme.muted,
+                    fontSize: "13px"
+                  }}
+                >
+                  Customer records
+                </p>
+              </div>
             </div>
 
             {showNotifications && (
-              <div
-                style={{
-                  background: theme.card,
-                  border: `1px solid ${theme.border}`,
-                  borderRadius: "16px",
-                  padding: "20px"
-                }}
-              >
+              <div style={cardStyle}>
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     gap: "12px",
-                    marginBottom: "16px"
+                    marginBottom: "8px",
+                    flexWrap: "wrap"
                   }}
                 >
-                  <h3 style={{ margin: 0 }}>
-                    Notifications
-                  </h3>
+                  <div>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "20px"
+                      }}
+                    >
+                      Notifications
+                    </h3>
+
+                    <p
+                      style={{
+                        margin: "5px 0 0",
+                        color: theme.muted,
+                        fontSize: "13px"
+                      }}
+                    >
+                      Recent account activity
+                    </p>
+                  </div>
 
                   <button
                     type="button"
                     onClick={loadNotifications}
                     disabled={loadingNotifications}
-                    style={{
-                      border: `1px solid ${theme.border}`,
-                      background: theme.button,
-                      color: theme.text,
-                      borderRadius: "8px",
-                      padding: "8px 12px",
-                      cursor: "pointer"
-                    }}
+                    style={secondaryButtonStyle}
                   >
                     {loadingNotifications
                       ? "Loading..."
@@ -282,7 +481,8 @@ export default function Dashboard({ merchant, darkMode }) {
                   notifications.length === 0 && (
                     <p
                       style={{
-                        color: theme.muted
+                        color: theme.muted,
+                        padding: "20px 0"
                       }}
                     >
                       No notifications yet.
@@ -298,87 +498,98 @@ export default function Dashboard({ merchant, darkMode }) {
                             key={notification.id}
                             style={{
                               borderTop: `1px solid ${theme.border}`,
-                              padding: "16px 0"
+                              padding: "17px 0"
                             }}
                           >
-                            <h4
+                            <div
                               style={{
-                                margin:
-                                  "0 0 8px"
+                                display: "flex",
+                                justifyContent:
+                                  "space-between",
+                                gap: "15px"
                               }}
                             >
-                              {
-                                notification.title
-                              }
-                            </h4>
-
-                            {notification.body && (
-                              <p
-                                style={{
-                                  color:
-                                    theme.muted
-                                }}
-                              >
-                                {
-                                  notification.body
-                                }
-                              </p>
-                            )}
-
-                            <small
-                              style={{
-                                color:
-                                  theme.muted
-                              }}
-                            >
-                              {new Date(
-                                notification.created_at
-                              ).toLocaleString()}
-                            </small>
-
-                            {notification.read_at ? (
-                              <p
-                                style={{
-                                  color:
-                                    "#10b981"
-                                }}
-                              >
-                                ✓ Read
-                              </p>
-                            ) : (
                               <div>
-                                <strong>
-                                  Unread
-                                </strong>
-
-                                <br />
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    markAsRead(
-                                      notification.id
-                                    )
-                                  }
+                                <h4
                                   style={{
-                                    marginTop:
-                                      "8px",
-                                    border:
-                                      "none",
-                                    background:
-                                      "transparent",
-                                    color:
-                                      "#3b82f6",
-                                    padding: 0,
-                                    cursor:
-                                      "pointer",
-                                    fontWeight:
-                                      "600"
+                                    margin:
+                                      "0 0 7px"
                                   }}
                                 >
-                                  Mark as read
-                                </button>
+                                  {
+                                    notification.title
+                                  }
+                                </h4>
+
+                                {notification.body && (
+                                  <p
+                                    style={{
+                                      margin:
+                                        "0 0 8px",
+                                      color:
+                                        theme.muted,
+                                      lineHeight:
+                                        "1.5"
+                                    }}
+                                  >
+                                    {
+                                      notification.body
+                                    }
+                                  </p>
+                                )}
+
+                                <small
+                                  style={{
+                                    color:
+                                      theme.muted
+                                  }}
+                                >
+                                  {new Date(
+                                    notification.created_at
+                                  ).toLocaleString()}
+                                </small>
                               </div>
+
+                              {!notification.read_at && (
+                                <span
+                                  style={{
+                                    color:
+                                      theme.primary,
+                                    fontSize:
+                                      "12px",
+                                    fontWeight:
+                                      "600",
+                                    whiteSpace:
+                                      "nowrap"
+                                  }}
+                                >
+                                  Unread
+                                </span>
+                              )}
+                            </div>
+
+                            {!notification.read_at && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  markAsRead(
+                                    notification.id
+                                  )
+                                }
+                                style={{
+                                  marginTop: "10px",
+                                  border: "none",
+                                  background:
+                                    "transparent",
+                                  color:
+                                    theme.primary,
+                                  padding: 0,
+                                  cursor: "pointer",
+                                  fontWeight: "600"
+                                }}
+                              >
+                                Mark as read
+                              </button>
                             )}
                           </article>
                         )
@@ -392,4 +603,4 @@ export default function Dashboard({ merchant, darkMode }) {
       </div>
     </section>
   );
-                  }
+}
