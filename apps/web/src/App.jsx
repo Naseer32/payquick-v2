@@ -149,14 +149,24 @@ export default function App() {
               flexWrap: "wrap"
             }}
           >
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "22px"
-              }}
-            >
-              PayQuick
-            </h1>
+            <button
+  type="button"
+  onClick={() => {
+    window.history.pushState({}, "", "/");
+    window.location.reload();
+  }}
+  style={{
+    border: "none",
+    background: "transparent",
+    color: theme.text,
+    cursor: "pointer",
+    fontSize: "22px",
+    fontWeight: "800",
+    padding: 0
+  }}
+>
+  PayQuick
+</button>
 
             <div
               style={{
