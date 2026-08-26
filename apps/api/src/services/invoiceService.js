@@ -32,6 +32,27 @@ export async function createInvoice({
   const id = randomUUID();
   const checkoutToken = randomUUID();
 
+  // PayQuick checkout links must remain valid for at least 24 hours.
+  const minimumExpiration = new Date(
+    Date.now() + 24 * 60 * 60 * 1000
+  );
+
+  let finalDueAt = minimumExpiration;
+
+  if (dueAt) {
+    const requestedDueAt = new Date(dueAt);
+
+    if (Number.isNaN(requestedDueAt.getTime())) {
+      throw new Error("Invalid due date.");
+    }
+
+    // Use the merchant's requested date only when it is
+    // at least 24 hours from invoice creation.
+    if (requestedDueAt > minimumExpiration) {
+      finalDueAt = requestedDueAt;
+    }
+  }
+
   const result = await query(
     `
       INSERT INTO invoices (
@@ -68,7 +89,7 @@ export async function createInvoice({
       currency,
       description || null,
       checkoutToken,
-      dueAt || null
+      finalDueAt
     ]
   );
 
