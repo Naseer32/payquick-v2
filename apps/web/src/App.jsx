@@ -223,13 +223,12 @@ export default function App() {
       );
 
     case "settings":
-      return (
-        <Settings
-          merchant={merchant}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-        />
-      );
+  return (
+    <Settings
+      merchant={merchant}
+      darkMode={darkMode}
+    />
+  );
 
     case "dashboard":
     default:
