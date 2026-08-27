@@ -10,40 +10,25 @@ import WalletButton from "./components/WalletButton.jsx";
 
 export default function App() {
   const [merchant, setMerchant] = useState(null);
-
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const [currentPage, setCurrentPage] = useState(() => {
-    const currentPath = window.location.pathname;
+    const path = window.location.pathname;
 
-    if (currentPath.startsWith("/pay/")) {
-      return "checkout";
-    }
-
-    if (currentPath === "/dashboard") {
-      return "dashboard";
-    }
-
-    if (currentPath === "/invoices") {
-      return "invoices";
-    }
-
-    if (currentPath === "/payments") {
-      return "payments";
-    }
-
-    if (currentPath === "/customers") {
-      return "customers";
-    }
+    if (path.startsWith("/pay/")) return "checkout";
+    if (path === "/dashboard") return "dashboard";
+    if (path === "/invoices") return "invoices";
+    if (path === "/payments") return "payments";
+    if (path === "/customers") return "customers";
 
     return "landing";
   });
 
   const [checkoutToken] = useState(() => {
-    const currentPath = window.location.pathname;
+    const path = window.location.pathname;
 
-    if (currentPath.startsWith("/pay/")) {
-      return currentPath.slice("/pay/".length);
+    if (path.startsWith("/pay/")) {
+      return path.slice("/pay/".length);
     }
 
     return "";
@@ -68,83 +53,61 @@ export default function App() {
       return;
     }
 
-    if (page === "dashboard") {
-      window.history.pushState({}, "", "/dashboard");
-      setActiveSection("dashboard");
-      return;
-    }
-
-    if (page === "invoices") {
-      window.history.pushState({}, "", "/invoices");
-      setActiveSection("invoices");
-      return;
-    }
-
-    if (page === "payments") {
-      window.history.pushState({}, "", "/payments");
-      setActiveSection("payments");
-      return;
-    }
-
-    if (page === "customers") {
-      window.history.pushState({}, "", "/customers");
-      setActiveSection("customers");
-    }
+    setActiveSection(page);
+    window.history.pushState({}, "", `/${page}`);
   }
 
   useEffect(() => {
     function handlePopState() {
-      const currentPath = window.location.pathname;
+      const path = window.location.pathname;
 
-      if (currentPath === "/") {
+      if (path === "/") {
         setCurrentPage("landing");
         return;
       }
 
-      if (currentPath === "/dashboard") {
+      if (path === "/dashboard") {
         setCurrentPage("dashboard");
         setActiveSection("dashboard");
         return;
       }
 
-      if (currentPath === "/invoices") {
+      if (path === "/invoices") {
         setCurrentPage("invoices");
         setActiveSection("invoices");
         return;
       }
 
-      if (currentPath === "/payments") {
+      if (path === "/payments") {
         setCurrentPage("payments");
         setActiveSection("payments");
         return;
       }
 
-      if (currentPath === "/customers") {
+      if (path === "/customers") {
         setCurrentPage("customers");
         setActiveSection("customers");
-        return;
       }
     }
 
     window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener(
+        "popstate",
+        handlePopState
+      );
     };
   }, []);
 
-  /*
-   * PAYMENT CHECKOUT
-   * This remains separate from the landing page and dashboard.
-   */
   if (currentPage === "checkout") {
     return (
       <main
         style={{
           minHeight: "100vh",
           background: darkMode
-            ? "#0f172a"
-            : "#ffffff",
+            ? "#0a0e1a"
+            : "#f8fafc",
           color: darkMode
             ? "#f8fafc"
             : "#0f172a"
@@ -155,40 +118,79 @@ export default function App() {
     );
   }
 
-  /*
-   * LANDING PAGE
-   */
   if (currentPage === "landing") {
     return (
       <Landing
-        onGetStarted={() => {
-          navigate("dashboard");
-        }}
+        onGetStarted={() => navigate("dashboard")}
       />
     );
   }
 
   const theme = darkMode
     ? {
-        background: "#0f172a",
+        background: "#0a0e1a",
+        sidebar: "#0d1321",
         surface: "#111827",
-        surfaceHover: "#1e293b",
+        surfaceHover: "#172033",
         text: "#f8fafc",
         muted: "#94a3b8",
-        border: "#334155",
-        primary: "#3b82f6"
+        border: "#202b3d",
+        primary: "#3b82f6",
+        active: "#182640"
       }
     : {
         background: "#f8fafc",
+        sidebar: "#ffffff",
         surface: "#ffffff",
         surfaceHover: "#f1f5f9",
         text: "#0f172a",
         muted: "#64748b",
         border: "#e2e8f0",
-        primary: "#2563eb"
+        primary: "#2563eb",
+        active: "#eff6ff"
       };
 
+  const navigation = [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: "▦"
+    },
+    {
+      id: "invoices",
+      label: "Invoices",
+      icon: "▤"
+    },
+    {
+      id: "customers",
+      label: "Customers",
+      icon: "♙"
+    },
+    {
+      id: "payments",
+      label: "Payments",
+      icon: "↗"
+    },
+    {
+      id: "webhooks",
+      label: "Webhooks",
+      icon: "◇"
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: "⚙"
+    }
+  ];
+
   function handleNavigation(section) {
+    if (
+      section === "webhooks" ||
+      section === "settings"
+    ) {
+      return;
+    }
+
     setActiveSection(section);
     setCurrentPage(section);
 
@@ -202,19 +204,13 @@ export default function App() {
   function renderSection() {
     switch (activeSection) {
       case "invoices":
-        return (
-          <Invoices merchant={merchant} />
-        );
+        return <Invoices merchant={merchant} />;
 
       case "payments":
-        return (
-          <Payments merchant={merchant} />
-        );
+        return <Payments merchant={merchant} />;
 
       case "customers":
-        return (
-          <Customers merchant={merchant} />
-        );
+        return <Customers merchant={merchant} />;
 
       case "dashboard":
       default:
@@ -227,179 +223,261 @@ export default function App() {
     }
   }
 
-  const navigation = [
-    {
-      id: "dashboard",
-      label: "Dashboard"
-    },
-    {
-      id: "invoices",
-      label: "Invoices"
-    },
-    {
-      id: "payments",
-      label: "Payments"
-    },
-    {
-      id: "customers",
-      label: "Customers"
-    }
-  ];
-
   return (
     <main
       style={{
         minHeight: "100vh",
         background: theme.background,
         color: theme.text,
+        fontFamily:
+          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         transition:
           "background 0.2s ease, color 0.2s ease"
       }}
     >
-      <header
+      <aside
         style={{
-          position: "sticky",
+          position: "fixed",
+          left: 0,
           top: 0,
-          zIndex: 100,
-          background: theme.surface,
-          borderBottom:
+          bottom: 0,
+          width: "230px",
+          background: theme.sidebar,
+          borderRight:
             `1px solid ${theme.border}`,
-          padding: "14px 20px"
+          padding: "22px 14px",
+          boxSizing: "border-box",
+          zIndex: 200,
+          display: "flex",
+          flexDirection: "column"
         }}
       >
+        <button
+          type="button"
+          onClick={() => navigate("dashboard")}
+          style={{
+            border: "none",
+            background: "transparent",
+            color: theme.text,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "4px 10px",
+            marginBottom: "30px",
+            textAlign: "left"
+          }}
+        >
+          <span
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "10px",
+              background: theme.primary,
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "800",
+              fontSize: "18px"
+            }}
+          >
+            P
+          </span>
+
+          <span
+            style={{
+              fontSize: "19px",
+              fontWeight: "800",
+              letterSpacing: "-0.4px"
+            }}
+          >
+            PayQuick
+          </span>
+        </button>
+
+        <nav
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px"
+          }}
+        >
+          {navigation.map((item) => {
+            const active =
+              activeSection === item.id;
+
+            const disabled =
+              item.id === "webhooks" ||
+              item.id === "settings";
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                disabled={disabled}
+                onClick={() =>
+                  handleNavigation(item.id)
+                }
+                style={{
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "10px",
+                  padding: "11px 12px",
+                  background: active
+                    ? theme.active
+                    : "transparent",
+                  color: active
+                    ? theme.primary
+                    : disabled
+                    ? theme.border
+                    : theme.muted,
+                  cursor: disabled
+                    ? "default"
+                    : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  textAlign: "left",
+                  fontSize: "14px",
+                  fontWeight: active
+                    ? "650"
+                    : "500",
+                  opacity: disabled ? 0.6 : 1
+                }}
+              >
+                <span
+                  style={{
+                    width: "22px",
+                    textAlign: "center",
+                    fontSize: "17px"
+                  }}
+                >
+                  {item.icon}
+                </span>
+
+                {item.label}
+
+                {disabled && (
+                  <span
+                    style={{
+                      marginLeft: "auto",
+                      fontSize: "9px",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px"
+                    }}
+                  >
+                    Soon
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
         <div
           style={{
-            maxWidth: "1200px",
-            margin: "0 auto"
+            marginTop: "auto",
+            paddingTop: "18px",
+            borderTop:
+              `1px solid ${theme.border}`
+          }}
+        >
+          <button
+            type="button"
+            onClick={() =>
+              setDarkMode(
+                (current) => !current
+              )
+            }
+            style={{
+              width: "100%",
+              border:
+                `1px solid ${theme.border}`,
+              background: theme.surface,
+              color: theme.text,
+              borderRadius: "10px",
+              padding: "10px 12px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "13px"
+            }}
+          >
+            <span>
+              {darkMode
+                ? "☀️ Light mode"
+                : "🌙 Dark mode"}
+            </span>
+
+            <span
+              style={{
+                color: theme.muted
+              }}
+            >
+              {darkMode ? "On" : "Off"}
+            </span>
+          </button>
+        </div>
+      </aside>
+
+      <div
+        style={{
+          marginLeft: "230px",
+          minHeight: "100vh"
+        }}
+      >
+        <header
+          style={{
+            height: "72px",
+            background: theme.surface,
+            borderBottom:
+              `1px solid ${theme.border}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 28px",
+            boxSizing: "border-box",
+            position: "sticky",
+            top: 0,
+            zIndex: 100
           }}
         >
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "16px",
-              flexWrap: "wrap"
+              fontSize: "14px",
+              color: theme.muted
             }}
           >
-            {/* PAYQUICK LOGO */}
-            <button
-              type="button"
-              onClick={() => {
-                navigate("landing");
-              }}
-              style={{
-                border: "none",
-                background: "transparent",
-                color: theme.text,
-                cursor: "pointer",
-                fontSize: "22px",
-                fontWeight: "800",
-                padding: 0
-              }}
-            >
-              PayQuick
-            </button>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px"
-              }}
-            >
-              <button
-                type="button"
-                onClick={() =>
-                  setDarkMode(
-                    (current) => !current
-                  )
-                }
-                title={
-                  darkMode
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
-                }
-                style={{
-                  border:
-                    `1px solid ${theme.border}`,
-                  background: theme.surface,
-                  color: theme.text,
-                  borderRadius: "9px",
-                  padding: "9px 11px",
-                  cursor: "pointer",
-                  fontSize: "16px"
-                }}
-              >
-                {darkMode
-                  ? "☀️"
-                  : "🌙"}
-              </button>
-
-              <WalletButton
-                onAuthenticated={
-                  setMerchant
-                }
-              />
-            </div>
+            {navigation.find(
+              (item) =>
+                item.id === activeSection
+            )?.label || "Dashboard"}
           </div>
 
-          <nav
+          <div
             style={{
               display: "flex",
-              gap: "6px",
-              overflowX: "auto",
-              marginTop: "14px",
-              paddingBottom: "2px"
+              alignItems: "center",
+              gap: "12px"
             }}
           >
-            {navigation.map((item) => {
-              const active =
-                activeSection === item.id;
+            <WalletButton
+              onAuthenticated={setMerchant}
+            />
+          </div>
+        </header>
 
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() =>
-                    handleNavigation(
-                      item.id
-                    )
-                  }
-                  style={{
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "9px 14px",
-                    whiteSpace:
-                      "nowrap",
-                    cursor: "pointer",
-                    background: active
-                      ? theme.primary
-                      : "transparent",
-                    color: active
-                      ? "#ffffff"
-                      : theme.muted,
-                    fontWeight: active
-                      ? "600"
-                      : "500"
-                  }}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
+        <div
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 12px"
+          }}
+        >
+          {renderSection()}
         </div>
-      </header>
-
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "24px 0"
-        }}
-      >
-        {renderSection()}
       </div>
     </main>
   );
