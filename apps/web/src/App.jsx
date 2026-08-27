@@ -6,6 +6,7 @@ import Invoices from "./pages/Invoices.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import Customers from "./pages/Customers.jsx";
 import Payments from "./pages/Payments.jsx";
+import Settings from "./pages/Settings.jsx";
 import WalletButton from "./components/WalletButton.jsx";
 
 export default function App() {
@@ -181,11 +182,8 @@ export default function App() {
   ];
 
   function handleNavigation(section) {
-    if (
-      section === "webhooks" ||
-      section === "settings"
-    ) {
-      return;
+    if (section === "webhooks") {
+  return;
     }
 
     setActiveSection(section);
@@ -199,41 +197,55 @@ export default function App() {
   }
 
   function renderSection() {
-    switch (activeSection) {
-      case "invoices":
-        return <Invoices
-  merchant={merchant}
-  darkMode={darkMode}
-/>;
+  switch (activeSection) {
+    case "invoices":
+      return (
+        <Invoices
+          merchant={merchant}
+          darkMode={darkMode}
+        />
+      );
 
-      case "payments":
-        return <Payments
-  merchant={merchant}
-  darkMode={darkMode}
-/>;
+    case "payments":
+      return (
+        <Payments
+          merchant={merchant}
+          darkMode={darkMode}
+        />
+      );
 
-      case "customers":
-        return <Customers
-  merchant={merchant}
-  darkMode={darkMode}
-/>;
+    case "customers":
+      return (
+        <Customers
+          merchant={merchant}
+          darkMode={darkMode}
+        />
+      );
 
-      case "dashboard":
-      default:
-        return (
-          <Dashboard
-            merchant={merchant}
-            darkMode={darkMode}
-          />
-        );
-    }
+    case "settings":
+      return (
+        <Settings
+          merchant={merchant}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
+      );
+
+    case "dashboard":
+    default:
+      return (
+        <Dashboard
+          merchant={merchant}
+          darkMode={darkMode}
+        />
+      );
   }
+}
 
-  const activeLabel =
-    navigation.find(
-      (item) => item.id === activeSection
-    )?.label || "Dashboard";
-
+const activeLabel =
+  navigation.find(
+    (item) => item.id === activeSection
+  )?.label || "Dashboard";
   return (
     <main
       style={{
