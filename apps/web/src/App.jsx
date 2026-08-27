@@ -201,7 +201,10 @@ export default function App() {
   function renderSection() {
     switch (activeSection) {
       case "invoices":
-        return <Invoices merchant={merchant} />;
+        return <Invoices
+  merchant={merchant}
+  darkMode={darkMode}
+/>;
 
       case "payments":
         return <Payments
@@ -210,7 +213,10 @@ export default function App() {
 />;
 
       case "customers":
-        return <Customers merchant={merchant} />;
+        return <Customers
+  merchant={merchant}
+  darkMode={darkMode}
+/>;
 
       case "dashboard":
       default:
