@@ -16,7 +16,6 @@ export default function Dashboard({ merchant, darkMode }) {
   });
 
   const [recentInvoices, setRecentInvoices] = useState([]);
-
   const [loadingStats, setLoadingStats] = useState(false);
   const [statsError, setStatsError] = useState("");
 
@@ -179,7 +178,7 @@ export default function Dashboard({ merchant, darkMode }) {
     : {
         background: "#f8fafc",
         card: "#ffffff",
-        cardHover: "#f8fafc",
+        cardHover: "#f1f5f9",
         text: "#0f172a",
         muted: "#64748b",
         border: "#e2e8f0",
@@ -204,13 +203,10 @@ export default function Dashboard({ merchant, darkMode }) {
   }
 
   function formatAmount(amount) {
-    return Number(amount || 0).toLocaleString(
-      undefined,
-      {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      }
-    );
+    return Number(amount || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
   }
 
   function formatRelativeTime(dateValue) {
@@ -226,9 +222,7 @@ export default function Dashboard({ merchant, darkMode }) {
       (Date.now() - date.getTime()) / 1000
     );
 
-    if (seconds < 60) {
-      return "Just now";
-    }
+    if (seconds < 60) return "Just now";
 
     const minutes = Math.floor(seconds / 60);
 
@@ -252,9 +246,7 @@ export default function Dashboard({ merchant, darkMode }) {
   }
 
   function getStatusStyle(status) {
-    const normalized = String(
-      status || ""
-    ).toLowerCase();
+    const normalized = String(status || "").toLowerCase();
 
     if (
       normalized === "paid" ||
@@ -297,7 +289,6 @@ export default function Dashboard({ merchant, darkMode }) {
     background: theme.card,
     border: `1px solid ${theme.border}`,
     borderRadius: "16px",
-    padding: "20px",
     boxSizing: "border-box"
   };
 
@@ -305,38 +296,38 @@ export default function Dashboard({ merchant, darkMode }) {
     return (
       <section
         style={{
-          minHeight: "calc(100vh - 120px)",
+          minHeight: "calc(100vh - 72px)",
           background: theme.background,
           color: theme.text,
-          padding: "40px 20px",
+          padding: "60px 20px",
           boxSizing: "border-box"
         }}
       >
         <div
           style={{
             maxWidth: "560px",
-            margin: "80px auto"
+            margin: "60px auto"
           }}
         >
           <div
             style={{
               ...cardStyle,
-              textAlign: "center",
-              padding: "52px 30px"
+              padding: "56px 32px",
+              textAlign: "center"
             }}
           >
             <div
               style={{
-                width: "68px",
-                height: "68px",
+                width: "64px",
+                height: "64px",
                 margin: "0 auto 22px",
                 borderRadius: "18px",
                 background: theme.primary,
-                color: "#ffffff",
+                color: "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "30px",
+                fontSize: "28px",
                 fontWeight: "800"
               }}
             >
@@ -346,8 +337,8 @@ export default function Dashboard({ merchant, darkMode }) {
             <h2
               style={{
                 margin: "0 0 10px",
-                fontSize: "28px",
-                letterSpacing: "-0.5px"
+                fontSize: "27px",
+                letterSpacing: "-0.6px"
               }}
             >
               Welcome to PayQuick
@@ -357,8 +348,8 @@ export default function Dashboard({ merchant, darkMode }) {
               style={{
                 margin: 0,
                 color: theme.muted,
-                lineHeight: "1.6",
-                fontSize: "15px"
+                lineHeight: "1.7",
+                fontSize: "14px"
               }}
             >
               Connect your wallet to access your
@@ -374,20 +365,21 @@ export default function Dashboard({ merchant, darkMode }) {
   return (
     <section
       style={{
-        minHeight: "calc(100vh - 120px)",
+        minHeight: "calc(100vh - 72px)",
         background: theme.background,
         color: theme.text,
-        padding: "30px 20px 50px",
+        padding: "34px 28px 60px",
         boxSizing: "border-box"
       }}
     >
       <div
         style={{
-          maxWidth: "1120px",
+          maxWidth: "1180px",
           margin: "0 auto"
         }}
       >
-        {/* HEADER */}
+        {/* DASHBOARD HEADER */}
+
         <div
           style={{
             display: "flex",
@@ -399,178 +391,147 @@ export default function Dashboard({ merchant, darkMode }) {
           }}
         >
           <div>
-            <p
+            <div
               style={{
-                margin: "0 0 7px",
-                color: theme.muted,
-                fontSize: "13px",
-                fontWeight: "500"
+                color: theme.primary,
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                letterSpacing: "0.7px",
+                marginBottom: "8px"
               }}
             >
-              Merchant dashboard
-            </p>
+              Overview
+            </div>
 
             <h1
               style={{
                 margin: 0,
                 fontSize: "30px",
                 lineHeight: "1.2",
-                letterSpacing: "-0.7px"
+                letterSpacing: "-0.8px"
               }}
             >
-              Welcome back 👋
+              Welcome back
             </h1>
 
             <p
               style={{
-                margin: "8px 0 0",
+                margin: "9px 0 0",
                 color: theme.muted,
                 fontSize: "14px"
               }}
             >
-              Here's what's happening with your
-              payments today.
+              Monitor your invoices, customers and
+              payment activity.
             </p>
           </div>
 
+          <button
+            type="button"
+            onClick={() =>
+              setShowNotifications((current) => !current)
+            }
+            style={{
+              position: "relative",
+              width: "46px",
+              height: "46px",
+              border: `1px solid ${theme.border}`,
+              background: theme.card,
+              color: theme.text,
+              borderRadius: "12px",
+              cursor: "pointer",
+              fontSize: "17px"
+            }}
+            title="Notifications"
+          >
+            🔔
+
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-5px",
+                  right: "-5px",
+                  minWidth: "19px",
+                  height: "19px",
+                  padding: "0 4px",
+                  borderRadius: "999px",
+                  background: theme.red,
+                  color: "#fff",
+                  fontSize: "9px",
+                  fontWeight: "700",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* WALLET SUMMARY */}
+
+        <div
+          style={{
+            ...cardStyle,
+            padding: "18px 20px",
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "16px",
+            flexWrap: "wrap"
+          }}
+        >
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "10px"
+              gap: "13px"
             }}
           >
-            <button
-              type="button"
-              onClick={() =>
-                setShowNotifications(
-                  (current) => !current
-                )
-              }
-              title="Notifications"
-              style={{
-                position: "relative",
-                width: "44px",
-                height: "44px",
-                border: `1px solid ${theme.border}`,
-                background: theme.card,
-                color: theme.text,
-                borderRadius: "12px",
-                cursor: "pointer",
-                fontSize: "18px"
-              }}
-            >
-              🔔
-
-              {unreadCount > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-5px",
-                    right: "-5px",
-                    minWidth: "19px",
-                    height: "19px",
-                    padding: "0 4px",
-                    borderRadius: "999px",
-                    background: theme.red,
-                    color: "#ffffff",
-                    fontSize: "9px",
-                    fontWeight: "700",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxSizing: "border-box"
-                  }}
-                >
-                  {unreadCount > 99
-                    ? "99+"
-                    : unreadCount}
-                </span>
-              )}
-            </button>
-
             <div
               style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "11px",
+                background: theme.primarySoft,
+                color: theme.primary,
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
-                border: `1px solid ${theme.border}`,
-                background: theme.card,
-                borderRadius: "12px",
-                padding: "7px 11px 7px 7px"
+                justifyContent: "center",
+                fontWeight: "800"
               }}
             >
-              <div
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  borderRadius: "50%",
-                  background: theme.primarySoft,
-                  color: theme.primary,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                  fontWeight: "700"
-                }}
-              >
-                P
-              </div>
-
-              <div
-                style={{
-                  display: "none"
-                }}
-              >
-                Merchant
-              </div>
-
-              <span
-                style={{
-                  color: theme.muted,
-                  fontSize: "12px"
-                }}
-              >
-                ▾
-              </span>
+              $
             </div>
-          </div>
-        </div>
 
-        {/* WALLET */}
-        <div
-          style={{
-            ...cardStyle,
-            marginBottom: "20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "15px",
-            flexWrap: "wrap"
-          }}
-        >
-          <div>
-            <p
-              style={{
-                margin: "0 0 6px",
-                color: theme.muted,
-                fontSize: "12px"
-              }}
-            >
-              Connected wallet
-            </p>
+            <div>
+              <p
+                style={{
+                  margin: "0 0 4px",
+                  color: theme.muted,
+                  fontSize: "11px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px"
+                }}
+              >
+                Connected wallet
+              </p>
 
-            <strong
-              style={{
-                fontSize: "15px",
-                fontFamily:
-                  "ui-monospace, SFMono-Regular, Menlo, monospace"
-              }}
-            >
-              {shortenAddress(
-                merchant.wallet_address
-              )}
-            </strong>
+              <strong
+                style={{
+                  fontSize: "14px",
+                  fontFamily:
+                    "ui-monospace, SFMono-Regular, Menlo, monospace"
+                }}
+              >
+                {shortenAddress(merchant.wallet_address)}
+              </strong>
+            </div>
           </div>
 
           <span
@@ -582,8 +543,8 @@ export default function Dashboard({ merchant, darkMode }) {
               background: theme.greenSoft,
               borderRadius: "999px",
               padding: "7px 11px",
-              fontSize: "12px",
-              fontWeight: "600"
+              fontSize: "11px",
+              fontWeight: "700"
             }}
           >
             <span
@@ -594,15 +555,18 @@ export default function Dashboard({ merchant, darkMode }) {
                 background: theme.green
               }}
             />
+
             Connected
           </span>
         </div>
 
         {/* ERROR */}
+
         {statsError && (
           <div
             style={{
               ...cardStyle,
+              padding: "15px 18px",
               marginBottom: "20px",
               borderColor: theme.red,
               background: theme.redSoft
@@ -613,7 +577,7 @@ export default function Dashboard({ merchant, darkMode }) {
               style={{
                 margin: 0,
                 color: theme.red,
-                fontSize: "14px"
+                fontSize: "13px"
               }}
             >
               {statsError}
@@ -622,21 +586,27 @@ export default function Dashboard({ merchant, darkMode }) {
         )}
 
         {/* STATS */}
+
         <div
           style={{
             display: "grid",
             gridTemplateColumns:
               "repeat(auto-fit, minmax(210px, 1fr))",
-            gap: "16px",
+            gap: "14px",
             marginBottom: "24px"
           }}
         >
-          <div style={cardStyle}>
+          <div
+            style={{
+              ...cardStyle,
+              padding: "22px"
+            }}
+          >
             <p
               style={{
-                margin: "0 0 12px",
+                margin: "0 0 14px",
                 color: theme.muted,
-                fontSize: "13px"
+                fontSize: "12px"
               }}
             >
               Total Received
@@ -645,68 +615,78 @@ export default function Dashboard({ merchant, darkMode }) {
             <strong
               style={{
                 display: "block",
-                fontSize: "27px",
-                letterSpacing: "-0.5px"
+                fontSize: "28px",
+                letterSpacing: "-0.8px"
               }}
             >
               {loadingStats
                 ? "..."
-                : `${formatAmount(
-                    stats.totalReceived
-                  )} ${stats.currency}`}
+                : `${formatAmount(stats.totalReceived)} ${stats.currency}`}
             </strong>
 
-            <p
+            <div
               style={{
-                margin: "9px 0 0",
+                marginTop: "12px",
+                display: "inline-flex",
+                padding: "5px 8px",
+                borderRadius: "7px",
+                background: theme.greenSoft,
                 color: theme.green,
-                fontSize: "12px",
-                fontWeight: "600"
+                fontSize: "10px",
+                fontWeight: "700"
               }}
             >
-              Confirmed payments
-            </p>
+              CONFIRMED
+            </div>
           </div>
 
-          <div style={cardStyle}>
+          <div
+            style={{
+              ...cardStyle,
+              padding: "22px"
+            }}
+          >
             <p
               style={{
-                margin: "0 0 12px",
+                margin: "0 0 14px",
                 color: theme.muted,
-                fontSize: "13px"
+                fontSize: "12px"
               }}
             >
-              Total Invoices
+              Invoices
             </p>
 
             <strong
               style={{
                 display: "block",
-                fontSize: "27px"
+                fontSize: "28px"
               }}
             >
-              {loadingStats
-                ? "..."
-                : stats.invoices}
+              {loadingStats ? "..." : stats.invoices}
             </strong>
 
             <p
               style={{
-                margin: "9px 0 0",
+                margin: "10px 0 0",
                 color: theme.muted,
-                fontSize: "12px"
+                fontSize: "11px"
               }}
             >
-              All invoice records
+              Total invoice records
             </p>
           </div>
 
-          <div style={cardStyle}>
+          <div
+            style={{
+              ...cardStyle,
+              padding: "22px"
+            }}
+          >
             <p
               style={{
-                margin: "0 0 12px",
+                margin: "0 0 14px",
                 color: theme.muted,
-                fontSize: "13px"
+                fontSize: "12px"
               }}
             >
               Payments
@@ -715,31 +695,34 @@ export default function Dashboard({ merchant, darkMode }) {
             <strong
               style={{
                 display: "block",
-                fontSize: "27px"
+                fontSize: "28px"
               }}
             >
-              {loadingStats
-                ? "..."
-                : stats.payments}
+              {loadingStats ? "..." : stats.payments}
             </strong>
 
             <p
               style={{
-                margin: "9px 0 0",
+                margin: "10px 0 0",
                 color: theme.muted,
-                fontSize: "12px"
+                fontSize: "11px"
               }}
             >
               Payment activity
             </p>
           </div>
 
-          <div style={cardStyle}>
+          <div
+            style={{
+              ...cardStyle,
+              padding: "22px"
+            }}
+          >
             <p
               style={{
-                margin: "0 0 12px",
+                margin: "0 0 14px",
                 color: theme.muted,
-                fontSize: "13px"
+                fontSize: "12px"
               }}
             >
               Customers
@@ -748,19 +731,17 @@ export default function Dashboard({ merchant, darkMode }) {
             <strong
               style={{
                 display: "block",
-                fontSize: "27px"
+                fontSize: "28px"
               }}
             >
-              {loadingStats
-                ? "..."
-                : stats.customers}
+              {loadingStats ? "..." : stats.customers}
             </strong>
 
             <p
               style={{
-                margin: "9px 0 0",
+                margin: "10px 0 0",
                 color: theme.muted,
-                fontSize: "12px"
+                fontSize: "11px"
               }}
             >
               Customer records
@@ -769,17 +750,17 @@ export default function Dashboard({ merchant, darkMode }) {
         </div>
 
         {/* RECENT INVOICES */}
+
         <div
           style={{
             ...cardStyle,
-            padding: 0,
             overflow: "hidden",
             marginBottom: "24px"
           }}
         >
           <div
             style={{
-              padding: "20px",
+              padding: "21px 22px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -791,7 +772,8 @@ export default function Dashboard({ merchant, darkMode }) {
               <h2
                 style={{
                   margin: 0,
-                  fontSize: "18px"
+                  fontSize: "17px",
+                  letterSpacing: "-0.2px"
                 }}
               >
                 Recent Invoices
@@ -804,7 +786,7 @@ export default function Dashboard({ merchant, darkMode }) {
                   fontSize: "12px"
                 }}
               >
-                Latest invoice activity
+                Your latest invoice activity
               </p>
             </div>
 
@@ -821,23 +803,22 @@ export default function Dashboard({ merchant, darkMode }) {
                 cursor: loadingStats
                   ? "not-allowed"
                   : "pointer",
-                fontSize: "12px",
-                fontWeight: "500"
+                fontSize: "11px",
+                fontWeight: "600"
               }}
             >
-              {loadingStats
-                ? "Loading..."
-                : "Refresh"}
+              {loadingStats ? "Refreshing..." : "Refresh"}
             </button>
           </div>
 
           {loadingStats ? (
             <div
               style={{
-                padding: "35px 20px",
+                borderTop: `1px solid ${theme.border}`,
+                padding: "38px 20px",
                 textAlign: "center",
                 color: theme.muted,
-                borderTop: `1px solid ${theme.border}`
+                fontSize: "13px"
               }}
             >
               Loading invoices...
@@ -845,13 +826,37 @@ export default function Dashboard({ merchant, darkMode }) {
           ) : recentInvoices.length === 0 ? (
             <div
               style={{
-                padding: "40px 20px",
-                textAlign: "center",
-                color: theme.muted,
-                borderTop: `1px solid ${theme.border}`
+                borderTop: `1px solid ${theme.border}`,
+                padding: "45px 20px",
+                textAlign: "center"
               }}
             >
-              No invoices yet.
+              <div
+                style={{
+                  width: "42px",
+                  height: "42px",
+                  margin: "0 auto 12px",
+                  borderRadius: "12px",
+                  background: theme.primarySoft,
+                  color: theme.primary,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "18px"
+                }}
+              >
+                +
+              </div>
+
+              <p
+                style={{
+                  margin: 0,
+                  color: theme.muted,
+                  fontSize: "13px"
+                }}
+              >
+                No invoices yet.
+              </p>
             </div>
           ) : (
             <div
@@ -860,23 +865,19 @@ export default function Dashboard({ merchant, darkMode }) {
                 borderTop: `1px solid ${theme.border}`
               }}
             >
-              <div
-                style={{
-                  minWidth: "650px"
-                }}
-              >
+              <div style={{ minWidth: "650px" }}>
                 <div
                   style={{
                     display: "grid",
                     gridTemplateColumns:
                       "1.2fr 1.5fr 1fr 1fr 0.8fr",
                     gap: "15px",
-                    padding: "12px 20px",
+                    padding: "11px 22px",
                     color: theme.muted,
-                    fontSize: "11px",
-                    fontWeight: "600",
+                    fontSize: "10px",
+                    fontWeight: "700",
                     textTransform: "uppercase",
-                    letterSpacing: "0.4px"
+                    letterSpacing: "0.5px"
                   }}
                 >
                   <span>Invoice</span>
@@ -888,9 +889,7 @@ export default function Dashboard({ merchant, darkMode }) {
 
                 {recentInvoices.map((invoice) => {
                   const statusStyle =
-                    getStatusStyle(
-                      invoice.status
-                    );
+                    getStatusStyle(invoice.status);
 
                   return (
                     <div
@@ -900,18 +899,15 @@ export default function Dashboard({ merchant, darkMode }) {
                         gridTemplateColumns:
                           "1.2fr 1.5fr 1fr 1fr 0.8fr",
                         gap: "15px",
-                        padding: "16px 20px",
+                        padding: "16px 22px",
                         borderTop: `1px solid ${theme.border}`,
                         alignItems: "center",
-                        fontSize: "13px"
+                        fontSize: "12px"
                       }}
                     >
                       <strong>
                         {invoice.invoice_number ||
-                          invoice.id?.slice(
-                            0,
-                            8
-                          )}
+                          invoice.id?.slice(0, 8)}
                       </strong>
 
                       <span
@@ -925,37 +921,29 @@ export default function Dashboard({ merchant, darkMode }) {
                       </span>
 
                       <strong>
-                        {formatAmount(
-                          invoice.amount
-                        )}{" "}
-                        {invoice.currency ||
-                          "USDC"}
+                        {formatAmount(invoice.amount)}{" "}
+                        {invoice.currency || "USDC"}
                       </strong>
 
                       <span
                         style={{
                           ...statusStyle,
-                          display:
-                            "inline-flex",
+                          display: "inline-flex",
                           width: "fit-content",
-                          borderRadius:
-                            "999px",
-                          padding:
-                            "5px 9px",
-                          fontSize: "10px",
+                          borderRadius: "999px",
+                          padding: "5px 9px",
+                          fontSize: "9px",
                           fontWeight: "700",
-                          textTransform:
-                            "capitalize"
+                          textTransform: "capitalize"
                         }}
                       >
-                        {invoice.status ||
-                          "unknown"}
+                        {invoice.status || "unknown"}
                       </span>
 
                       <span
                         style={{
                           color: theme.muted,
-                          fontSize: "11px"
+                          fontSize: "10px"
                         }}
                       >
                         {formatRelativeTime(
@@ -971,11 +959,12 @@ export default function Dashboard({ merchant, darkMode }) {
         </div>
 
         {/* NOTIFICATIONS */}
+
         {showNotifications && (
           <div
             style={{
               ...cardStyle,
-              marginBottom: "20px"
+              padding: "21px 22px"
             }}
           >
             <div
@@ -984,7 +973,7 @@ export default function Dashboard({ merchant, darkMode }) {
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: "12px",
-                marginBottom: "5px",
+                marginBottom: "6px",
                 flexWrap: "wrap"
               }}
             >
@@ -992,7 +981,7 @@ export default function Dashboard({ merchant, darkMode }) {
                 <h2
                   style={{
                     margin: 0,
-                    fontSize: "18px"
+                    fontSize: "17px"
                   }}
                 >
                   Notifications
@@ -1019,9 +1008,11 @@ export default function Dashboard({ merchant, darkMode }) {
                   color: theme.text,
                   borderRadius: "9px",
                   padding: "8px 12px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  fontWeight: "500"
+                  cursor: loadingNotifications
+                    ? "not-allowed"
+                    : "pointer",
+                  fontSize: "11px",
+                  fontWeight: "600"
                 }}
               >
                 {loadingNotifications
@@ -1035,7 +1026,7 @@ export default function Dashboard({ merchant, darkMode }) {
                 role="alert"
                 style={{
                   color: theme.red,
-                  fontSize: "13px"
+                  fontSize: "12px"
                 }}
               >
                 {notificationError}
@@ -1047,7 +1038,8 @@ export default function Dashboard({ merchant, darkMode }) {
                 <p
                   style={{
                     color: theme.muted,
-                    padding: "20px 0"
+                    padding: "20px 0",
+                    fontSize: "13px"
                   }}
                 >
                   No notifications yet.
@@ -1056,96 +1048,91 @@ export default function Dashboard({ merchant, darkMode }) {
 
             {!loadingNotifications &&
               notifications.length > 0 &&
-              notifications.map(
-                (notification) => (
-                  <article
-                    key={notification.id}
+              notifications.map((notification) => (
+                <article
+                  key={notification.id}
+                  style={{
+                    borderTop: `1px solid ${theme.border}`,
+                    padding: "17px 0"
+                  }}
+                >
+                  <div
                     style={{
-                      borderTop: `1px solid ${theme.border}`,
-                      padding: "17px 0"
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: "15px"
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent:
-                          "space-between",
-                        gap: "15px"
-                      }}
-                    >
-                      <div>
-                        <h4
-                          style={{
-                            margin: "0 0 6px",
-                            fontSize: "14px"
-                          }}
-                        >
-                          {notification.title}
-                        </h4>
+                    <div>
+                      <h4
+                        style={{
+                          margin: "0 0 6px",
+                          fontSize: "13px"
+                        }}
+                      >
+                        {notification.title}
+                      </h4>
 
-                        {notification.body && (
-                          <p
-                            style={{
-                              margin: "0 0 7px",
-                              color: theme.muted,
-                              lineHeight: "1.5",
-                              fontSize: "13px"
-                            }}
-                          >
-                            {notification.body}
-                          </p>
-                        )}
-
-                        <small
+                      {notification.body && (
+                        <p
                           style={{
+                            margin: "0 0 7px",
                             color: theme.muted,
-                            fontSize: "11px"
+                            lineHeight: "1.5",
+                            fontSize: "12px"
                           }}
                         >
-                          {formatRelativeTime(
-                            notification.created_at
-                          )}
-                        </small>
-                      </div>
-
-                      {!notification.read_at && (
-                        <span
-                          style={{
-                            color: theme.primary,
-                            fontSize: "11px",
-                            fontWeight: "600"
-                          }}
-                        >
-                          Unread
-                        </span>
+                          {notification.body}
+                        </p>
                       )}
+
+                      <small
+                        style={{
+                          color: theme.muted,
+                          fontSize: "10px"
+                        }}
+                      >
+                        {formatRelativeTime(
+                          notification.created_at
+                        )}
+                      </small>
                     </div>
 
                     {!notification.read_at && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          markAsRead(
-                            notification.id
-                          )
-                        }
+                      <span
                         style={{
-                          marginTop: "9px",
-                          border: "none",
-                          background: "transparent",
                           color: theme.primary,
-                          padding: 0,
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "600"
+                          fontSize: "10px",
+                          fontWeight: "700"
                         }}
                       >
-                        Mark as read
-                      </button>
+                        Unread
+                      </span>
                     )}
-                  </article>
-                )
-              )}
+                  </div>
+
+                  {!notification.read_at && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        markAsRead(notification.id)
+                      }
+                      style={{
+                        marginTop: "9px",
+                        border: "none",
+                        background: "transparent",
+                        color: theme.primary,
+                        padding: 0,
+                        cursor: "pointer",
+                        fontSize: "11px",
+                        fontWeight: "600"
+                      }}
+                    >
+                      Mark as read
+                    </button>
+                  )}
+                </article>
+              ))}
           </div>
         )}
       </div>
