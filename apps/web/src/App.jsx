@@ -204,7 +204,10 @@ export default function App() {
         return <Invoices merchant={merchant} />;
 
       case "payments":
-        return <Payments merchant={merchant} />;
+        return <Payments
+  merchant={merchant}
+  darkMode={darkMode}
+/>;
 
       case "customers":
         return <Customers merchant={merchant} />;
