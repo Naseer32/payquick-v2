@@ -346,8 +346,7 @@ const activeLabel =
               activeSection === item.id;
 
             const disabled =
-              item.id === "webhooks" ||
-              item.id === "settings";
+  item.id === "webhooks";
 
             return (
               <button
