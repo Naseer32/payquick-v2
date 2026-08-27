@@ -93,10 +93,7 @@ export default function App() {
     window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener(
-        "popstate",
-        handlePopState
-      );
+      window.removeEventListener("popstate", handlePopState);
     };
   }, []);
 
@@ -105,12 +102,8 @@ export default function App() {
       <main
         style={{
           minHeight: "100vh",
-          background: darkMode
-            ? "#0a0e1a"
-            : "#f8fafc",
-          color: darkMode
-            ? "#f8fafc"
-            : "#0f172a"
+          background: darkMode ? "#0a0e1a" : "#f8fafc",
+          color: darkMode ? "#f8fafc" : "#0f172a"
         }}
       >
         <Checkout checkoutToken={checkoutToken} />
@@ -128,18 +121,20 @@ export default function App() {
 
   const theme = darkMode
     ? {
-        background: "#0a0e1a",
-        sidebar: "#0d1321",
-        surface: "#111827",
-        surfaceHover: "#172033",
+        background: "#080c14",
+        sidebar: "#0c111c",
+        surface: "#101722",
+        surfaceHover: "#151e2c",
         text: "#f8fafc",
-        muted: "#94a3b8",
-        border: "#202b3d",
+        muted: "#8d99aa",
+        border: "#1d2735",
         primary: "#3b82f6",
-        active: "#182640"
+        primaryHover: "#2563eb",
+        active: "#17243a",
+        danger: "#ef4444"
       }
     : {
-        background: "#f8fafc",
+        background: "#f6f8fb",
         sidebar: "#ffffff",
         surface: "#ffffff",
         surfaceHover: "#f1f5f9",
@@ -147,7 +142,9 @@ export default function App() {
         muted: "#64748b",
         border: "#e2e8f0",
         primary: "#2563eb",
-        active: "#eff6ff"
+        primaryHover: "#1d4ed8",
+        active: "#eff6ff",
+        danger: "#dc2626"
       };
 
   const navigation = [
@@ -223,6 +220,11 @@ export default function App() {
     }
   }
 
+  const activeLabel =
+    navigation.find(
+      (item) => item.id === activeSection
+    )?.label || "Dashboard";
+
   return (
     <main
       style={{
@@ -241,11 +243,10 @@ export default function App() {
           left: 0,
           top: 0,
           bottom: 0,
-          width: "230px",
+          width: "240px",
           background: theme.sidebar,
-          borderRight:
-            `1px solid ${theme.border}`,
-          padding: "22px 14px",
+          borderRight: `1px solid ${theme.border}`,
+          padding: "24px 16px",
           boxSizing: "border-box",
           zIndex: 200,
           display: "flex",
@@ -262,16 +263,16 @@ export default function App() {
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: "10px",
-            padding: "4px 10px",
-            marginBottom: "30px",
+            gap: "11px",
+            padding: "3px 9px",
+            marginBottom: "38px",
             textAlign: "left"
           }}
         >
           <span
             style={{
-              width: "34px",
-              height: "34px",
+              width: "36px",
+              height: "36px",
               borderRadius: "10px",
               background: theme.primary,
               color: "#ffffff",
@@ -279,7 +280,10 @@ export default function App() {
               alignItems: "center",
               justifyContent: "center",
               fontWeight: "800",
-              fontSize: "18px"
+              fontSize: "18px",
+              boxShadow: darkMode
+                ? "0 6px 20px rgba(59, 130, 246, 0.20)"
+                : "0 5px 14px rgba(37, 99, 235, 0.18)"
             }}
           >
             P
@@ -289,18 +293,32 @@ export default function App() {
             style={{
               fontSize: "19px",
               fontWeight: "800",
-              letterSpacing: "-0.4px"
+              letterSpacing: "-0.5px"
             }}
           >
             PayQuick
           </span>
         </button>
 
+        <div
+          style={{
+            padding: "0 10px",
+            marginBottom: "10px",
+            fontSize: "10px",
+            fontWeight: "700",
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            color: theme.muted
+          }}
+        >
+          Workspace
+        </div>
+
         <nav
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "5px"
+            gap: "4px"
           }}
         >
           {navigation.map((item) => {
@@ -321,8 +339,14 @@ export default function App() {
                 }
                 style={{
                   width: "100%",
-                  border: "none",
-                  borderRadius: "10px",
+                  border: active
+                    ? `1px solid ${
+                        darkMode
+                          ? "#263a59"
+                          : "#dbeafe"
+                      }`
+                    : "1px solid transparent",
+                  borderRadius: "9px",
                   padding: "11px 12px",
                   background: active
                     ? theme.active
@@ -330,7 +354,7 @@ export default function App() {
                   color: active
                     ? theme.primary
                     : disabled
-                    ? theme.border
+                    ? theme.muted
                     : theme.muted,
                   cursor: disabled
                     ? "default"
@@ -343,28 +367,41 @@ export default function App() {
                   fontWeight: active
                     ? "650"
                     : "500",
-                  opacity: disabled ? 0.6 : 1
+                  opacity: disabled ? 0.48 : 1,
+                  transition:
+                    "background 0.15s ease, border 0.15s ease, color 0.15s ease"
                 }}
               >
                 <span
                   style={{
                     width: "22px",
-                    textAlign: "center",
-                    fontSize: "17px"
+                    height: "22px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "6px",
+                    background: active
+                      ? darkMode
+                        ? "#203554"
+                        : "#dbeafe"
+                      : "transparent",
+                    fontSize: "16px"
                   }}
                 >
                   {item.icon}
                 </span>
 
-                {item.label}
+                <span>{item.label}</span>
 
                 {disabled && (
                   <span
                     style={{
                       marginLeft: "auto",
-                      fontSize: "9px",
+                      fontSize: "8px",
+                      fontWeight: "700",
                       textTransform: "uppercase",
-                      letterSpacing: "0.5px"
+                      letterSpacing: "0.7px",
+                      color: theme.muted
                     }}
                   >
                     Soon
@@ -377,54 +414,59 @@ export default function App() {
 
         <div
           style={{
-            marginTop: "auto",
-            paddingTop: "18px",
-            borderTop:
-              `1px solid ${theme.border}`
+            marginTop: "auto"
           }}
         >
-          <button
-            type="button"
-            onClick={() =>
-              setDarkMode(
-                (current) => !current
-              )
-            }
+          <div
             style={{
-              width: "100%",
-              border:
-                `1px solid ${theme.border}`,
-              background: theme.surface,
-              color: theme.text,
-              borderRadius: "10px",
-              padding: "10px 12px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "13px"
+              borderTop: `1px solid ${theme.border}`,
+              paddingTop: "16px"
             }}
           >
-            <span>
-              {darkMode
-                ? "☀️ Light mode"
-                : "🌙 Dark mode"}
-            </span>
-
-            <span
+            <button
+              type="button"
+              onClick={() =>
+                setDarkMode(
+                  (current) => !current
+                )
+              }
               style={{
-                color: theme.muted
+                width: "100%",
+                border: `1px solid ${theme.border}`,
+                background: theme.surface,
+                color: theme.text,
+                borderRadius: "9px",
+                padding: "10px 12px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: "12px",
+                fontWeight: "500"
               }}
             >
-              {darkMode ? "On" : "Off"}
-            </span>
-          </button>
+              <span>
+                {darkMode
+                  ? "☀️ Light mode"
+                  : "🌙 Dark mode"}
+              </span>
+
+              <span
+                style={{
+                  color: theme.muted,
+                  fontSize: "11px"
+                }}
+              >
+                {darkMode ? "On" : "Off"}
+              </span>
+            </button>
+          </div>
         </div>
       </aside>
 
       <div
         style={{
-          marginLeft: "230px",
+          marginLeft: "240px",
           minHeight: "100vh"
         }}
       >
@@ -432,28 +474,38 @@ export default function App() {
           style={{
             height: "72px",
             background: theme.surface,
-            borderBottom:
-              `1px solid ${theme.border}`,
+            borderBottom: `1px solid ${theme.border}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 28px",
+            padding: "0 30px",
             boxSizing: "border-box",
             position: "sticky",
             top: 0,
             zIndex: 100
           }}
         >
-          <div
-            style={{
-              fontSize: "14px",
-              color: theme.muted
-            }}
-          >
-            {navigation.find(
-              (item) =>
-                item.id === activeSection
-            )?.label || "Dashboard"}
+          <div>
+            <div
+              style={{
+                fontSize: "18px",
+                fontWeight: "700",
+                letterSpacing: "-0.3px",
+                color: theme.text
+              }}
+            >
+              {activeLabel}
+            </div>
+
+            <div
+              style={{
+                marginTop: "2px",
+                fontSize: "11px",
+                color: theme.muted
+              }}
+            >
+              Manage your payments and invoices
+            </div>
           </div>
 
           <div
@@ -471,9 +523,10 @@ export default function App() {
 
         <div
           style={{
-            maxWidth: "1200px",
+            maxWidth: "1240px",
             margin: "0 auto",
-            padding: "0 12px"
+            padding: "28px 30px 48px",
+            boxSizing: "border-box"
           }}
         >
           {renderSection()}
