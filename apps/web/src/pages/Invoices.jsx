@@ -74,6 +74,7 @@ export default function Invoices({ merchant }) {
     function handleVisibilityChange() {
       if (document.visibilityState === "visible") {
         loadInvoices();
+        loadCustomers();
       }
     }
 
@@ -465,6 +466,24 @@ export default function Invoices({ merchant }) {
                     </option>
                   ))}
                 </select>
+
+                <button
+                  type="button"
+                  onClick={loadCustomers}
+                  style={{
+                    marginTop: "6px",
+                    alignSelf: "flex-start",
+                    border: "none",
+                    background: "transparent",
+                    color: "#2563eb",
+                    fontSize: "11px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    padding: 0
+                  }}
+                >
+                  Refresh customer list
+                </button>
               </label>
 
               <label
