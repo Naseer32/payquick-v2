@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sendNativeTransfer } from "../services/blockchain.js";
 
 export default function Settings({
   merchant,
@@ -6,6 +7,12 @@ export default function Settings({
   setDarkMode
 }) {
   const [copied, setCopied] = useState(false);
+
+  const [withdrawTo, setWithdrawTo] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawError, setWithdrawError] = useState("");
+  const [withdrawSuccess, setWithdrawSuccess] = useState("");
 
   const theme = darkMode
     ? {
@@ -50,6 +57,30 @@ export default function Settings({
       }, 2000);
     } catch {
       setCopied(false);
+    }
+  }
+
+  async function handleWithdraw(event) {
+    event.preventDefault();
+
+    setWithdrawing(true);
+    setWithdrawError("");
+    setWithdrawSuccess("");
+
+    try {
+      const txHash = await sendNativeTransfer(
+        merchant.wallet_address,
+        withdrawTo,
+        withdrawAmount
+      );
+
+      setWithdrawSuccess(`Sent! Transaction: ${txHash}`);
+      setWithdrawTo("");
+      setWithdrawAmount("");
+    } catch (err) {
+      setWithdrawError(err.message || "Withdrawal failed.");
+    } finally {
+      setWithdrawing(false);
     }
   }
 
@@ -334,6 +365,158 @@ export default function Settings({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* WITHDRAW */}
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: "18px"
+          }}
+        >
+          <div
+            style={{
+              marginBottom: "20px"
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "18px"
+              }}
+            >
+              Withdraw Funds
+            </h2>
+
+            <p
+              style={{
+                margin: "6px 0 0",
+                color: theme.muted,
+                fontSize: "13px"
+              }}
+            >
+              Send USDC from your merchant wallet to another address.
+            </p>
+          </div>
+
+          <form onSubmit={handleWithdraw}>
+            <div
+              style={{
+                display: "grid",
+                gap: "14px"
+              }}
+            >
+              <label
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "7px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  color: theme.muted
+                }}
+              >
+                Recipient address
+
+                <input
+                  value={withdrawTo}
+                  onChange={(event) => setWithdrawTo(event.target.value)}
+                  placeholder="0x..."
+                  required
+                  style={{
+                    height: "44px",
+                    boxSizing: "border-box",
+                    border: `1px solid ${theme.border}`,
+                    background: theme.background,
+                    color: theme.text,
+                    borderRadius: "9px",
+                    padding: "0 12px",
+                    fontSize: "13px",
+                    outline: "none",
+                    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
+                  }}
+                />
+              </label>
+
+              <label
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "7px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  color: theme.muted
+                }}
+              >
+                Amount (USDC)
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.000001"
+                  value={withdrawAmount}
+                  onChange={(event) => setWithdrawAmount(event.target.value)}
+                  placeholder="10"
+                  required
+                  style={{
+                    height: "44px",
+                    boxSizing: "border-box",
+                    border: `1px solid ${theme.border}`,
+                    background: theme.background,
+                    color: theme.text,
+                    borderRadius: "9px",
+                    padding: "0 12px",
+                    fontSize: "14px",
+                    outline: "none"
+                  }}
+                />
+              </label>
+
+              {withdrawError && (
+                <p
+                  role="alert"
+                  style={{
+                    margin: 0,
+                    color: theme.red,
+                    fontSize: "12px"
+                  }}
+                >
+                  {withdrawError}
+                </p>
+              )}
+
+              {withdrawSuccess && (
+                <p
+                  style={{
+                    margin: 0,
+                    color: theme.green,
+                    fontSize: "12px",
+                    wordBreak: "break-all"
+                  }}
+                >
+                  {withdrawSuccess}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={withdrawing}
+                style={{
+                  border: "none",
+                  background: theme.primary,
+                  color: "#ffffff",
+                  borderRadius: "9px",
+                  padding: "12px 18px",
+                  cursor: withdrawing ? "not-allowed" : "pointer",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  minHeight: "44px"
+                }}
+              >
+                {withdrawing ? "Sending..." : "Send Withdrawal"}
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* APPEARANCE */}
