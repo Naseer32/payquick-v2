@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../services/api.js";
+import { getNativeBalance } from "../services/blockchain.js";
 
 export default function Dashboard({ merchant, darkMode }) {
   const [notifications, setNotifications] = useState([]);
@@ -18,6 +19,10 @@ export default function Dashboard({ merchant, darkMode }) {
   const [recentInvoices, setRecentInvoices] = useState([]);
   const [loadingStats, setLoadingStats] = useState(false);
   const [statsError, setStatsError] = useState("");
+
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [balanceError, setBalanceError] = useState("");
+  const [loadingBalance, setLoadingBalance] = useState(false);
 
   async function loadNotifications() {
     if (!merchant) return;
@@ -60,6 +65,22 @@ export default function Dashboard({ merchant, darkMode }) {
       setNotificationError(
         err.message || "Unable to mark notification as read."
       );
+    }
+  }
+
+  async function loadBalance() {
+    if (!merchant?.wallet_address) return;
+
+    setLoadingBalance(true);
+    setBalanceError("");
+
+    try {
+      const value = await getNativeBalance(merchant.wallet_address);
+      setWalletBalance(value);
+    } catch (err) {
+      setBalanceError(err.message || "Unable to load wallet balance.");
+    } finally {
+      setLoadingBalance(false);
     }
   }
 
@@ -156,6 +177,7 @@ export default function Dashboard({ merchant, darkMode }) {
 
     loadNotifications();
     loadStats();
+    loadBalance();
   }, [merchant]);
 
   const theme = darkMode
@@ -532,6 +554,40 @@ export default function Dashboard({ merchant, darkMode }) {
                 {shortenAddress(merchant.wallet_address)}
               </strong>
             </div>
+          </div>
+
+          <div style={{ textAlign: "right" }}>
+            <p
+              style={{
+                margin: "0 0 4px",
+                color: theme.muted,
+                fontSize: "11px",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px"
+              }}
+            >
+              Balance
+            </p>
+
+            <strong style={{ fontSize: "16px" }}>
+              {loadingBalance
+                ? "..."
+                : walletBalance !== null
+                ? `${formatAmount(walletBalance)} USDC`
+                : "Unavailable"}
+            </strong>
+
+            {balanceError && (
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  color: theme.red,
+                  fontSize: "10px"
+                }}
+              >
+                {balanceError}
+              </p>
+            )}
           </div>
 
           <span

@@ -121,3 +121,31 @@ export async function signMessage(message, walletAddress) {
     params: [message, normalizedAddress]
   });
 }
+
+
+export async function getNativeBalance(walletAddress) {
+  const provider = getEthereumProvider();
+
+  if (!walletAddress) {
+    throw new Error("Wallet address is required to fetch balance.");
+  }
+
+  const balanceHex = await provider.request({
+    method: "eth_getBalance",
+    params: [walletAddress, "latest"]
+  });
+
+  const balanceRaw = BigInt(balanceHex);
+  const decimals = 6;
+  const divisor = BigInt(10) ** BigInt(decimals);
+
+  const whole = balanceRaw / divisor;
+  const fraction = balanceRaw % divisor;
+
+  const fractionStr = fraction
+    .toString()
+    .padStart(decimals, "0")
+    .slice(0, 2);
+
+  return parseFloat(whole.toString() + "." + fractionStr);
+}
