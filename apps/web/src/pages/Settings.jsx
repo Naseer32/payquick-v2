@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { sendNativeTransfer } from "../services/blockchain.js";
+import { apiRequest } from "../services/api.js";
 
 export default function Settings({
   merchant,
@@ -13,6 +14,13 @@ export default function Settings({
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState("");
   const [withdrawSuccess, setWithdrawSuccess] = useState("");
+
+  const [apiKeys, setApiKeys] = useState([]);
+  const [loadingKeys, setLoadingKeys] = useState(false);
+  const [keyName, setKeyName] = useState("");
+  const [creatingKey, setCreatingKey] = useState(false);
+  const [newRawKey, setNewRawKey] = useState("");
+  const [keyError, setKeyError] = useState("");
 
   const theme = darkMode
     ? {
@@ -57,6 +65,68 @@ export default function Settings({
       }, 2000);
     } catch {
       setCopied(false);
+    }
+  }
+
+  async function loadApiKeys() {
+    if (!merchant) return;
+
+    setLoadingKeys(true);
+    setKeyError("");
+
+    try {
+      const result = await apiRequest("/api/keys");
+      setApiKeys(result.keys || []);
+    } catch (err) {
+      setKeyError(err.message || "Unable to load API keys.");
+    } finally {
+      setLoadingKeys(false);
+    }
+  }
+
+  useEffect(() => {
+    if (merchant) {
+      loadApiKeys();
+    } else {
+      setApiKeys([]);
+    }
+  }, [merchant]);
+
+  async function handleCreateKey(event) {
+    event.preventDefault();
+
+    setCreatingKey(true);
+    setKeyError("");
+    setNewRawKey("");
+
+    try {
+      const result = await apiRequest("/api/keys", {
+        method: "POST",
+        body: JSON.stringify({ name: keyName })
+      });
+
+      setNewRawKey(result.key.rawKey);
+      setKeyName("");
+
+      await loadApiKeys();
+    } catch (err) {
+      setKeyError(err.message || "Unable to create API key.");
+    } finally {
+      setCreatingKey(false);
+    }
+  }
+
+  async function handleRevokeKey(keyId) {
+    setKeyError("");
+
+    try {
+      await apiRequest(`/api/keys/${keyId}/revoke`, {
+        method: "POST"
+      });
+
+      await loadApiKeys();
+    } catch (err) {
+      setKeyError(err.message || "Unable to revoke API key.");
     }
   }
 
@@ -517,6 +587,164 @@ export default function Settings({
               </button>
             </div>
           </form>
+        </div>
+
+        {/* API KEYS */}
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: "18px"
+          }}
+        >
+          <div style={{ marginBottom: "20px" }}>
+            <h2 style={{ margin: 0, fontSize: "18px" }}>
+              API Keys
+            </h2>
+            <p
+              style={{
+                margin: "6px 0 0",
+                color: theme.muted,
+                fontSize: "13px"
+              }}
+            >
+              Generate keys for developers to integrate with PayQuick.
+            </p>
+          </div>
+
+          <form onSubmit={handleCreateKey} style={{ marginBottom: "18px" }}>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <input
+                value={keyName}
+                onChange={(event) => setKeyName(event.target.value)}
+                placeholder="Key name (e.g. Website integration)"
+                style={{
+                  flex: 1,
+                  minWidth: "200px",
+                  height: "44px",
+                  boxSizing: "border-box",
+                  border: `1px solid ${theme.border}`,
+                  background: theme.background,
+                  color: theme.text,
+                  borderRadius: "9px",
+                  padding: "0 12px",
+                  fontSize: "13px",
+                  outline: "none"
+                }}
+              />
+
+              <button
+                type="submit"
+                disabled={creatingKey}
+                style={{
+                  border: "none",
+                  background: theme.primary,
+                  color: "#ffffff",
+                  borderRadius: "9px",
+                  padding: "0 18px",
+                  cursor: creatingKey ? "not-allowed" : "pointer",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  minHeight: "44px"
+                }}
+              >
+                {creatingKey ? "Generating..." : "Generate Key"}
+              </button>
+            </div>
+          </form>
+
+          {newRawKey && (
+            <div
+              style={{
+                marginBottom: "18px",
+                padding: "14px",
+                borderRadius: "10px",
+                border: `1px solid ${theme.primary}`,
+                background: theme.background
+              }}
+            >
+              <p style={{ margin: "0 0 8px", fontSize: "12px", color: theme.muted }}>
+                Copy this key now — it will not be shown again.
+              </p>
+              <code
+                style={{
+                  display: "block",
+                  wordBreak: "break-all",
+                  fontSize: "12px",
+                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
+                }}
+              >
+                {newRawKey}
+              </code>
+            </div>
+          )}
+
+          {keyError && (
+            <p role="alert" style={{ color: theme.red, fontSize: "12px", marginBottom: "14px" }}>
+              {keyError}
+            </p>
+          )}
+
+          {loadingKeys ? (
+            <p style={{ color: theme.muted, fontSize: "13px" }}>Loading keys...</p>
+          ) : apiKeys.length === 0 ? (
+            <p style={{ color: theme.muted, fontSize: "13px" }}>No API keys yet.</p>
+          ) : (
+            <div style={{ display: "grid", gap: "10px" }}>
+              {apiKeys.map((key) => (
+                <div
+                  key={key.id}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "12px 14px",
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: "10px",
+                    flexWrap: "wrap"
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: "13px" }}>
+                      {key.name || "Unnamed key"}
+                    </strong>
+                    <div
+                      style={{
+                        color: theme.muted,
+                        fontSize: "11px",
+                        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
+                      }}
+                    >
+                      {key.key_prefix}...
+                    </div>
+                  </div>
+
+                  {key.revoked_at ? (
+                    <span style={{ color: theme.red, fontSize: "11px", fontWeight: "700" }}>
+                      Revoked
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleRevokeKey(key.id)}
+                      style={{
+                        border: `1px solid ${theme.red}`,
+                        background: "transparent",
+                        color: theme.red,
+                        borderRadius: "8px",
+                        padding: "7px 11px",
+                        cursor: "pointer",
+                        fontSize: "11px",
+                        fontWeight: "600"
+                      }}
+                    >
+                      Revoke
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* APPEARANCE */}
