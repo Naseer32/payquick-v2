@@ -1,6 +1,33 @@
 import { getSession } from "../services/sessionService.js";
+import { validateApiKey } from "../services/apiKeyService.js";
 
 export async function requireAuth(req, res, next) {
+  const apiKey = req.headers["x-api-key"];
+
+  if (apiKey) {
+    try {
+      const keyAuth = await validateApiKey(apiKey);
+
+      if (!keyAuth) {
+        return res.status(401).json({
+          ok: false,
+          error: "Invalid or revoked API key"
+        });
+      }
+
+      req.auth = keyAuth;
+
+      return next();
+    } catch (error) {
+      console.error("API key validation error:", error);
+
+      return res.status(500).json({
+        ok: false,
+        error: "Unable to validate API key"
+      });
+    }
+  }
+
   const authorization = req.headers.authorization;
 
   if (!authorization?.startsWith("Bearer ")) {

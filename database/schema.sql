@@ -85,3 +85,16 @@ CREATE INDEX sessions_wallet_address_idx
 
 CREATE INDEX sessions_expires_at_idx
   ON sessions(expires_at);
+
+CREATE TABLE api_keys (
+  id UUID PRIMARY KEY,
+  merchant_id UUID NOT NULL REFERENCES merchants(id),
+  key_hash TEXT NOT NULL UNIQUE,
+  key_prefix TEXT NOT NULL,
+  name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  revoked_at TIMESTAMPTZ
+);
+
+CREATE INDEX api_keys_merchant_id_idx
+  ON api_keys(merchant_id);
