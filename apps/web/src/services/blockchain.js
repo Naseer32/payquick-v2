@@ -136,7 +136,7 @@ export async function getNativeBalance(walletAddress) {
   });
 
   const balanceRaw = BigInt(balanceHex);
-  const decimals = 6;
+  const decimals = 18;
   const divisor = BigInt(10) ** BigInt(decimals);
 
   const whole = balanceRaw / divisor;
@@ -148,4 +148,38 @@ export async function getNativeBalance(walletAddress) {
     .slice(0, 2);
 
   return parseFloat(whole.toString() + "." + fractionStr);
+}
+
+
+export async function sendNativeTransfer(fromAddress, toAddress, amount) {
+  const provider = getEthereumProvider();
+
+  if (!fromAddress) {
+    throw new Error("Sender wallet address is required.");
+  }
+
+  if (!toAddress) {
+    throw new Error("Recipient address is required.");
+  }
+
+  if (!amount || Number(amount) <= 0) {
+    throw new Error("Enter a valid amount to send.");
+  }
+
+  const decimals = 18;
+  const amountInBaseUnits = BigInt(Math.round(Number(amount) * 10 ** decimals));
+  const amountHex = "0x" + amountInBaseUnits.toString(16);
+
+  const txHash = await provider.request({
+    method: "eth_sendTransaction",
+    params: [
+      {
+        from: fromAddress,
+        to: toAddress,
+        value: amountHex
+      }
+    ]
+  });
+
+  return txHash;
 }

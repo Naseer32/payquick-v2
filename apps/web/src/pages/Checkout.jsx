@@ -97,7 +97,7 @@ export default function Checkout({ checkoutToken }) {
 
       const amountInBaseUnits = ethers.parseUnits(
         String(checkout.amount),
-        6
+        18
       );
 
       const memo = `${checkout.description || "Payment"} [${checkout.invoice_number}]`;
