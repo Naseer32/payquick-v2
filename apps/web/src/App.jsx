@@ -101,6 +101,18 @@ export default function App() {
       if (path === "/customers") {
         setCurrentPage("customers");
         setActiveSection("customers");
+        return;
+      }
+
+      if (path === "/settings") {
+        setCurrentPage("settings");
+        setActiveSection("settings");
+        return;
+      }
+
+      if (path.startsWith("/pay/")) {
+        setCurrentPage("checkout");
+        return;
       }
     }
 
