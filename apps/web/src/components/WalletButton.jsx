@@ -124,6 +124,17 @@ export default function WalletButton({ onAuthenticated }) {
         <button
           type="button"
           onClick={handleLogout}
+          style={{
+            marginLeft: "8px",
+            border: "1px solid #cbd5e1",
+            background: "#ffffff",
+            color: "#334155",
+            borderRadius: "10px",
+            padding: "10px 16px",
+            cursor: "pointer",
+            fontSize: "13px",
+            fontWeight: "600"
+          }}
         >
           Disconnect
         </button>
