@@ -11,7 +11,16 @@ import WalletButton from "./components/WalletButton.jsx";
 
 export default function App() {
   const [merchant, setMerchant] = useState(null);
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState(() => {
+    const path = window.location.pathname;
+
+    if (path === "invoices" || path === "/invoices") return "invoices";
+    if (path === "/payments") return "payments";
+    if (path === "/customers") return "customers";
+    if (path === "/settings") return "settings";
+
+    return "dashboard";
+  });
 
   const [currentPage, setCurrentPage] = useState(() => {
     const path = window.location.pathname;
@@ -21,6 +30,7 @@ export default function App() {
     if (path === "/invoices") return "invoices";
     if (path === "/payments") return "payments";
     if (path === "/customers") return "customers";
+    if (path === "/settings") return "settings";
 
     return "landing";
   });
