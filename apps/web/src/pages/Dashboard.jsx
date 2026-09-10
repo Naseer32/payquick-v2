@@ -915,101 +915,70 @@ export default function Dashboard({ merchant, darkMode }) {
               </p>
             </div>
           ) : (
-            <div
-              style={{
-                overflowX: "auto",
-                borderTop: `1px solid ${theme.border}`
-              }}
-            >
-              <div style={{ minWidth: "650px" }}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "1.2fr 1.5fr 1fr 1fr 0.8fr",
-                    gap: "15px",
-                    padding: "11px 22px",
-                    color: theme.muted,
-                    fontSize: "10px",
-                    fontWeight: "700",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px"
-                  }}
-                >
-                  <span>Invoice</span>
-                  <span>Customer</span>
-                  <span>Amount</span>
-                  <span>Status</span>
-                  <span>Time</span>
-                </div>
+            <div style={{ display: "grid", gap: "12px" }}>
+              {recentInvoices.map((invoice) => {
+                const statusStyle = getStatusStyle(invoice.status);
 
-                {recentInvoices.map((invoice) => {
-                  const statusStyle =
-                    getStatusStyle(invoice.status);
-
-                  return (
+                return (
+                  <div
+                    key={invoice.id}
+                    style={{
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: "12px",
+                      padding: "14px 16px"
+                    }}
+                  >
                     <div
-                      key={invoice.id}
                       style={{
-                        display: "grid",
-                        gridTemplateColumns:
-                          "1.2fr 1.5fr 1fr 1fr 0.8fr",
-                        gap: "15px",
-                        padding: "16px 22px",
-                        borderTop: `1px solid ${theme.border}`,
-                        alignItems: "center",
-                        fontSize: "12px"
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: "10px",
+                        marginBottom: "8px"
                       }}
                     >
-                      <strong>
-                        {invoice.invoice_number ||
-                          invoice.id?.slice(0, 8)}
-                      </strong>
-
-                      <span
-                        style={{
-                          color: theme.muted
-                        }}
-                      >
-                        {invoice.customer_name ||
-                          invoice.customer_email ||
-                          "No customer"}
-                      </span>
-
-                      <strong>
-                        {formatAmount(invoice.amount)}{" "}
-                        {invoice.currency || "USDC"}
+                      <strong style={{ fontSize: "13px" }}>
+                        {invoice.invoice_number || invoice.id?.slice(0, 8)}
                       </strong>
 
                       <span
                         style={{
                           ...statusStyle,
-                          display: "inline-flex",
-                          width: "fit-content",
                           borderRadius: "999px",
-                          padding: "5px 9px",
+                          padding: "4px 9px",
                           fontSize: "9px",
                           fontWeight: "700",
-                          textTransform: "capitalize"
+                          textTransform: "capitalize",
+                          whiteSpace: "nowrap"
                         }}
                       >
                         {invoice.status || "unknown"}
                       </span>
-
-                      <span
-                        style={{
-                          color: theme.muted,
-                          fontSize: "10px"
-                        }}
-                      >
-                        {formatRelativeTime(
-                          invoice.created_at
-                        )}
-                      </span>
                     </div>
-                  );
-                })}
-              </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "10px",
+                        color: theme.muted,
+                        fontSize: "11px"
+                      }}
+                    >
+                      <span>
+                        {invoice.customer_name || invoice.customer_email || "No customer"}
+                      </span>
+
+                      <span>{formatRelativeTime(invoice.created_at)}</span>
+                    </div>
+
+                    <strong style={{ display: "block", marginTop: "8px", fontSize: "14px" }}>
+                      {formatAmount(invoice.amount)} {invoice.currency || "USDC"}
+                    </strong>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
