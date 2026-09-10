@@ -5,7 +5,7 @@ import {
   logout
 } from "../services/auth.js";
 
-export default function WalletButton({ onAuthenticated }) {
+export default function WalletButton({ onAuthenticated, isMobile = false }) {
   const [account, setAccount] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -96,8 +96,18 @@ export default function WalletButton({ onAuthenticated }) {
     setAccount("");
   }
 
+  const buttonFontSize = isMobile ? "11px" : "13px";
+  const buttonPadding = isMobile ? "8px 10px" : "10px 16px";
+
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        alignItems: isMobile ? "flex-end" : "center",
+        gap: isMobile ? "6px" : "8px"
+      }}
+    >
       <button
         type="button"
         onClick={account ? handleLogout : handleConnect}
@@ -107,10 +117,11 @@ export default function WalletButton({ onAuthenticated }) {
           background: loading ? "#93c5fd" : "#2563eb",
           color: "#ffffff",
           borderRadius: "10px",
-          padding: "10px 16px",
+          padding: buttonPadding,
           cursor: loading ? "not-allowed" : "pointer",
-          fontSize: "13px",
-          fontWeight: "700"
+          fontSize: buttonFontSize,
+          fontWeight: "700",
+          whiteSpace: "nowrap"
         }}
       >
         {loading
@@ -125,15 +136,15 @@ export default function WalletButton({ onAuthenticated }) {
           type="button"
           onClick={handleLogout}
           style={{
-            marginLeft: "8px",
             border: "1px solid #cbd5e1",
             background: "#ffffff",
             color: "#334155",
             borderRadius: "10px",
-            padding: "10px 16px",
+            padding: buttonPadding,
             cursor: "pointer",
-            fontSize: "13px",
-            fontWeight: "600"
+            fontSize: buttonFontSize,
+            fontWeight: "600",
+            whiteSpace: "nowrap"
           }}
         >
           Disconnect
@@ -141,7 +152,16 @@ export default function WalletButton({ onAuthenticated }) {
       )}
 
       {error && (
-        <p role="alert">
+        <p
+          role="alert"
+          style={{
+            margin: 0,
+            fontSize: "10px",
+            color: "#dc2626",
+            maxWidth: "140px",
+            textAlign: "right"
+          }}
+        >
           {error}
         </p>
       )}

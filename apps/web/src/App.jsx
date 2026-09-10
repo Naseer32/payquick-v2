@@ -527,23 +527,24 @@ const activeLabel =
       >
         <header
           style={{
-            height: "72px",
+            minHeight: "72px",
             background: theme.surface,
             borderBottom: `1px solid ${theme.border}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: isMobile ? "0 16px" : "0 30px",
+            gap: "10px",
+            padding: isMobile ? "10px 14px" : "0 30px",
             boxSizing: "border-box",
             position: "sticky",
             top: 0,
             zIndex: 100
           }}
         >
-          <div>
+          <div style={{ minWidth: 0, flexShrink: 1 }}>
             <div
               style={{
-                fontSize: "18px",
+                fontSize: isMobile ? "15px" : "18px",
                 fontWeight: "700",
                 letterSpacing: "-0.3px",
                 color: theme.text
@@ -567,11 +568,13 @@ const activeLabel =
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "12px"
+              gap: "12px",
+              flexShrink: 0
             }}
           >
             <WalletButton
               onAuthenticated={setMerchant}
+              isMobile={isMobile}
             />
           </div>
         </header>
