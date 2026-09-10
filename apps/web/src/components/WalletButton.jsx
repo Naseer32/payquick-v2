@@ -102,6 +102,16 @@ export default function WalletButton({ onAuthenticated }) {
         type="button"
         onClick={account ? handleLogout : handleConnect}
         disabled={loading}
+        style={{
+          border: "1px solid #2563eb",
+          background: loading ? "#93c5fd" : "#2563eb",
+          color: "#ffffff",
+          borderRadius: "10px",
+          padding: "10px 16px",
+          cursor: loading ? "not-allowed" : "pointer",
+          fontSize: "13px",
+          fontWeight: "700"
+        }}
       >
         {loading
           ? "Checking..."
