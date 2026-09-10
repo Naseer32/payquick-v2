@@ -39,6 +39,19 @@ export default function App() {
     return localStorage.getItem("payquick_theme") === "dark";
   });
 
+  const [isMobile, setIsMobile] = useState(
+    () => window.innerWidth < 768
+  );
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     localStorage.setItem(
       "payquick_theme",
@@ -269,7 +282,7 @@ const activeLabel =
           padding: "24px 16px",
           boxSizing: "border-box",
           zIndex: 200,
-          display: "flex",
+          display: isMobile ? "none" : "flex",
           flexDirection: "column"
         }}
       >
@@ -485,8 +498,9 @@ const activeLabel =
 
       <div
         style={{
-          marginLeft: "240px",
-          minHeight: "100vh"
+          marginLeft: isMobile ? 0 : "240px",
+          minHeight: "100vh",
+          paddingBottom: isMobile ? "64px" : 0
         }}
       >
         <header
@@ -497,7 +511,7 @@ const activeLabel =
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 30px",
+            padding: isMobile ? "0 16px" : "0 30px",
             boxSizing: "border-box",
             position: "sticky",
             top: 0,
@@ -544,12 +558,59 @@ const activeLabel =
           style={{
             maxWidth: "1240px",
             margin: "0 auto",
-            padding: "28px 30px 48px",
+            padding: isMobile ? "16px 12px 24px" : "28px 30px 48px",
             boxSizing: "border-box"
           }}
         >
           {renderSection()}
         </div>
+
+        {isMobile && (
+          <nav
+            style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "60px",
+              background: theme.sidebar,
+              borderTop: `1px solid ${theme.border}`,
+              display: "flex",
+              zIndex: 200
+            }}
+          >
+            {navigation.map((item) => {
+              const active = activeSection === item.id;
+              const disabled = item.id === "webhooks";
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => handleNavigation(item.id)}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    background: "transparent",
+                    color: active ? theme.primary : theme.muted,
+                    opacity: disabled ? 0.4 : 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "2px",
+                    fontSize: "9px",
+                    fontWeight: active ? "700" : "500"
+                  }}
+                >
+                  <span style={{ fontSize: "17px" }}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </main>
   );
